@@ -1,4 +1,30 @@
 #result_div
 {
-    margin: 10px 100% 10px 0;
+    margin: 10px 50% 10px 0;
+}
+
+#results_image
+{
+    width:100px;
+    height:100px;
+}
+
+table, th, td
+{
+  border: 1px solid black;
+}
+
+#top_form
+{
+    margin: 10px 3px 30px 0px;
+}
+
+#seedInput
+{
+    margin: 0px 3px 0px 0px;
+}
+
+.result_box
+{
+    padding: 15px;
 }

@@ -15,13 +15,8 @@ async function get_data(seedValue) {
         },
     })
 
-    if (!response.ok) {
-        render(true, [])
-        return
-    }
-
     const data = await response.json()
-    render(null, data)
+    render(data)
 }
 
 var url_dict = {'Giant': 'https://api-assets.clashroyale.com/cards/300/Axr4ox5_b7edmLsoHxBX3vmgijAIibuF6RImTbqLlXE.png',
@@ -123,12 +118,7 @@ var url_dict = {'Giant': 'https://api-assets.clashroyale.com/cards/300/Axr4ox5_b
  'Clone': 'https://api-assets.clashroyale.com/cards/300/mHVCet-1TkwWq-pxVIU2ZWY9_2z7Z7wtP25ArEUsP_g.png',
  'Goblin Hut': 'https://api-assets.clashroyale.com/cards/300/l8ZdzzNLcwB4u7ihGgxNFQOjCT_njFuAhZr7D6PRF7E.png'}
 
-function render(err, data) {
-
-    if (err) {
-        // Do something smart here :)
-        return
-    }
+function render(data) {
 
     var cards = data['cards']
     var play_counts = data['play_counts']
@@ -136,7 +126,19 @@ function render(err, data) {
     var messages = data['messages']
 
     // Show results
-    for (i = 0; i < cards.length; i++) {
-        document.getElementById("stats_results").innerHTML += "<div id=\"result_div\">"+cards[i]+"</div>"
+    var result = "<table>"
+    var n = 5;
+    for (i = 0; i < cards.length; i+=n) {
+        result += "<tr>"
+        for (j = i; j <= i+n; j++) {
+            if (typeof cards[j] !== 'undefined') {
+                result += "<td class=\"result_box\"><div>"+cards[j]+"</div>"
+                result += "<div><img id=\"results_image\" src="+url_dict[cards[j]]+"></div>"
+                result += "<div>Play Count: "+play_counts[j]+"</div>"
+                result += "<div>Win Rate: "+win_percents[j]+"%</div></td>"
+            }
+        }
+        result += "</tr>"
     }
+    document.getElementById("stats_results").innerHTML += result
 }

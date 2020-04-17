@@ -184,8 +184,8 @@ def process():
     play_counts = []
     for card, play_count in all_opponent_card_plays.items():
         cards.append(card)
-        play_counts.append(play_count)
-        win_percents.append(processed_win_stats[card])
+        play_counts.append(str(int(play_count)))
+        win_percents.append(str(int(processed_win_stats[card]*100)))
 
 
     return jsonify(cards=cards,
