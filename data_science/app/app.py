@@ -69,7 +69,14 @@ def process_battles(player_tag, battle_list):
         pickle.dump(data, f)
     BUCKET.blob('user_data/{}.p'.format(player_tag)).upload_from_file(open(local_fname, 'rb'))
     os.remove(local_fname)
-    return data
+
+    # Get all available team cards
+    your_team_cards = sorted(set(itertools.chain(*data['team_cards'])))
+
+    # Get all available opponent cards
+    opponent_team_cards = sorted(set(itertools.chain(*data['opponent_cards'])))
+
+    return data, your_team_cards, opponent_team_cards
 
 def process_data(data, filter_dict):
     win_card_stats = {}
@@ -163,22 +170,17 @@ def index():
     return render_template('index.html')
 
 
-@app.route('/process', methods=['POST'])
-def process():
-    content = request.get_json()
-    player_tag = content.get('player_tag')
-
-    battles = get_battles(player_tag)
-    processed_battles = process_battles(player_tag, battles)
-    filter_dict = {
-        'team_cards':[],
-        'opponent_cards':[],
-        'team_trophy_count_range':[],
-        'battle_time_range':[],
-        'game_modes':[],
-        'arena':[]
-    }
-    processed_win_stats, all_opponent_card_plays, messages = process_data(processed_battles, filter_dict)
+def process_and_return_data(filter_dict=None):
+    if filter_dict is None:
+        filter_dict = {
+            'team_cards':[],
+            'opponent_cards':[],
+            'team_trophy_count_range':[],
+            'battle_time_range':[],
+            'game_modes':[],
+            'arena':[]
+        }
+    processed_win_stats, all_opponent_card_plays, messages = process_data(PROCESSED_BATTLES, filter_dict)
     cards = []
     win_percents = []
     play_counts = []
@@ -187,11 +189,54 @@ def process():
         play_counts.append(str(int(play_count)))
         win_percents.append(str(int(processed_win_stats[card]*100)))
 
+    return cards, play_counts, win_percents, messages
+
+@app.route('/process', methods=['POST'])
+def process_front_page():
+    content = request.get_json()
+    player_tag = content.get('player_tag')
+
+    battles = get_battles(player_tag)
+
+    global PROCESSED_BATTLES
+    PROCESSED_BATTLES, your_team_cards, opponent_team_cards = process_battles(player_tag, battles)
+
+    cards, play_counts, win_percents, messages = process_and_return_data()
+
+    return jsonify(cards=cards,
+                   play_counts=play_counts,
+                   win_percents=win_percents,
+                   messages=messages,
+                   your_team_cards=your_team_cards,
+                   opponent_team_cards=opponent_team_cards)
+
+
+def clean_filters(raw_filter_values):
+    return [i for i in raw_filter_values.split(': ') if ((i !='No Filter') and ('Contains' not in i))]
+
+@app.route('/filter', methods=['POST'])
+def process_filter():
+    content = request.get_json()
+    your_team_filter_values = clean_filters(content.get('your_team_filter'))
+    opponent_team_filter_values = clean_filters(content.get('opponent_team_filter'))
+
+    filter_dict = {
+        'team_cards':your_team_filter_values,
+        'opponent_cards':opponent_team_filter_values,
+        'team_trophy_count_range':[],
+        'battle_time_range':[],
+        'game_modes':[],
+        'arena':[]
+    }
+
+    cards, play_counts, win_percents, messages = process_and_return_data(filter_dict)
 
     return jsonify(cards=cards,
                    play_counts=play_counts,
                    win_percents=win_percents,
                    messages=messages)
+
+
 
 
 

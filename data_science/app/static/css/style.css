@@ -28,3 +28,18 @@ table, th, td
 {
     padding: 15px;
 }
+
+/* FILTERS  */
+.filter_btn {
+	margin-bottom: 5px;
+}
+.attrib-button:hover {
+	background: lightgray;
+	cursor: pointer;
+}
+.attrib-button {
+	padding-left: 5px;
+}
+#submit_filters_btn {
+    margin: 10px 10px 10px 0px
+}

@@ -14,9 +14,9 @@ async function get_data(seedValue) {
             'Content-Type': 'application/json',
         },
     })
-
     const data = await response.json()
     render(data)
+    fill_filters(data)
 }
 
 var url_dict = {'Giant': 'https://api-assets.clashroyale.com/cards/300/Axr4ox5_b7edmLsoHxBX3vmgijAIibuF6RImTbqLlXE.png',
@@ -131,7 +131,7 @@ function render(data) {
     for (i = 0; i < cards.length; i+=n) {
         result += "<tr>"
         for (j = i; j <= i+n; j++) {
-            if (typeof cards[j] !== 'undefined') {
+            if ((typeof cards[j] !== 'undefined') && (typeof url_dict[cards[j]] !== 'undefined')) {
                 result += "<td class=\"result_box\"><div>"+cards[j]+"</div>"
                 result += "<div><img id=\"results_image\" src="+url_dict[cards[j]]+"></div>"
                 result += "<div>Play Count: "+play_counts[j]+"</div>"
@@ -140,5 +140,6 @@ function render(data) {
         }
         result += "</tr>"
     }
+    document.getElementById("stats_results").innerHTML = ""
     document.getElementById("stats_results").innerHTML += result
 }
