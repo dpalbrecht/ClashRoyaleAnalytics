@@ -40,6 +40,13 @@ table, th, td
 .attrib-button {
 	padding-left: 5px;
 }
+.attrib-button-single:hover {
+	background: lightgray;
+	cursor: pointer;
+}
+.attrib-button-single {
+	padding-left: 5px;
+}
 #submit_filters_btn {
     margin: 10px 10px 10px 0px
 }

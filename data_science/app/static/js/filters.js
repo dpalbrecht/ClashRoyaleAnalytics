@@ -22,21 +22,45 @@ $(document).on("click", ".attrib-button", function() {
     submit_filters()
 });
 
-// function set_trophy_slider (min_val, max_val) {
-//     $("#trophy_slider").ionRangeSlider({
-//         type: "double",
-//         grid: true,
-//         min: min_val,
-//         max: max_val,
-//         from: min_val,
-//         to: max_val,
-//         prefix: ""
-//     });
-// }
+$(document).on("click", ".attrib-button-single", function() {
+    var clicked_attrib = this.innerHTML;
+    var this_dropdown = $(this).parent()[0].parentElement.children[0];
+    var this_dropdown_text = this_dropdown.innerHTML.split(": ")[0]
+    var this_dropdown_attrib = this_dropdown.innerHTML.split(": ")[1]
+    var this_dropdown_attrib_list = this_dropdown.innerHTML.split(": ")[1].split(", ")
+    if (this_dropdown_attrib == "No Filter") {
+        this_dropdown.innerHTML = this_dropdown_text + ": " + clicked_attrib
+    } else if (this_dropdown_attrib_list.indexOf(clicked_attrib) != -1) {
+        for (var i = 0; i < this_dropdown_attrib_list.length; i++) {
+           if (this_dropdown_attrib_list[i] === clicked_attrib) {
+             this_dropdown_attrib_list.splice(i, 1);
+           }
+        }
+        this_dropdown.innerHTML = this_dropdown_text + ": " + this_dropdown_attrib_list.join(", ")
+        if (this_dropdown.innerHTML.split(": ")[1] == "") {
+            this_dropdown.innerHTML = this_dropdown.innerHTML + "No Filter"
+        }
+    } else {
+        this_dropdown.innerHTML = this_dropdown_text + ": " + clicked_attrib;
+    }
+    submit_filters()
+});
 
-// $("#trophy_slider").on("change", function () {
-//     submit_filters()
-// });
+function set_trophy_slider (min_val, max_val) {
+    $("#trophy_slider").ionRangeSlider({
+        type: "double",
+        grid: true,
+        min: min_val,
+        max: max_val,
+        from: min_val,
+        to: max_val,
+        prefix: ""
+    });
+}
+
+$("#trophy_slider").on("change", function () {
+    submit_filters()
+});
 
 async function submit_filters() {
     const response = await fetch('/filter', {
@@ -46,7 +70,8 @@ async function submit_filters() {
             opponent_team_filter: document.getElementById("opponent_team_filter").children[0].innerHTML,
             game_mode_filter: document.getElementById("game_mode_filter").children[0].innerHTML,
             arena_filter: document.getElementById("arena_filter").children[0].innerHTML,
-            // trophy_filter: document.getElementById('trophy_slider').value
+            trophy_filter: document.getElementById('trophy_slider').value,
+            battle_time_filter: document.getElementById("battle_time_filter").children[0].innerHTML
         }),
         headers: {
             'Content-Type': 'application/json',
@@ -77,6 +102,6 @@ function fill_filters(data) {
     set_filter_values(data['arenas'],
         "arena_dropdown",
         "dropdown-item attrib-button")
-    // set_trophy_slider(data['min_trophy'],
-    //                   data['max_trophy'])
+    set_trophy_slider(data['min_trophy'],
+                      data['max_trophy'])
 }

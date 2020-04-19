@@ -100,9 +100,12 @@ def process_data(data, filter_dict):
     win_inds = np.where(win_loss=='win')[0]
 
     # Find battles between battle times
+    # TODO: Make this work for a single range (last day/week/month)
     if filter_dict['battle_time_range'] == []:
         time_inds = np.array(range(len(battle_times)))
     else:
+        import pdb; pdb.set_trace()
+        # use datetime.datetime.utcnow() to find ranges based on the filter value
         start_month, start_day, start_year = filter_dict['battle_time_range'][0].split('/')
         start = pd.to_datetime(start_year+start_month+start_day+'T000000.000Z')
         end_month, end_day, end_year = filter_dict['battle_time_range'][-1].split('/')
@@ -222,7 +225,7 @@ def process_front_page():
 
 
 def clean_filters(raw_filter_values):
-    return [i for i in raw_filter_values.split(': ') if ((i !='No Filter') and ('Contains' not in i))]
+    return [i for i in raw_filter_values.split(': ')[1].split(', ') if i !='No Filter']
 
 def clean_trophy_filter(raw_filter_values):
     split_vals = raw_filter_values.split(';')
@@ -235,19 +238,18 @@ def process_filter():
     opponent_team_filter_values = clean_filters(content.get('opponent_team_filter'))
     game_mode_filter_values = clean_filters(content.get('game_mode_filter'))
     arena_filter_values = clean_filters(content.get('arena_filter'))
-    # min_trophy, max_trophy = clean_trophy_filter(content.get('trophy_filter'))
+    battle_time_filter_values = clean_filters(content.get('battle_time_filter'))[0]
+    min_trophy, max_trophy = clean_trophy_filter(content.get('trophy_filter'))
 
     filter_dict = {
         'team_cards':your_team_filter_values,
         'opponent_cards':opponent_team_filter_values,
-        # 'team_trophy_count_range':[min_trophy, max_trophy],
-        'team_trophy_count_range':[],
-        'battle_time_range':[],
+        'team_trophy_count_range':[min_trophy, max_trophy],
+        'battle_time_range':battle_time_filter_values,
         'game_modes':game_mode_filter_values,
         'arena':arena_filter_values
     }
 
-    # TODO: Error introduced with trophy slider and filter. Bug looks to be in filtering. Not a bug, but somehow not getting any items returned?
     cards, play_counts, win_percents, messages = process_and_return_data(filter_dict)
 
     return jsonify(cards=cards,
