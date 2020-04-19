@@ -72,11 +72,17 @@ def process_battles(player_tag, battle_list):
 
     # Get all available team cards
     your_team_cards = sorted(set(itertools.chain(*data['team_cards'])))
-
     # Get all available opponent cards
     opponent_team_cards = sorted(set(itertools.chain(*data['opponent_cards'])))
+    # Get all available game modes
+    game_modes = sorted(set(data['game_mode']))
+    # Get all available arenas
+    arenas = sorted(set(data['arena']))
+    # Get min and max trophies
+    trophy_dict = {'min':min(data['team_trophy_count']),
+                   'max':max(data['team_trophy_count'])}
 
-    return data, your_team_cards, opponent_team_cards
+    return data, your_team_cards, opponent_team_cards, game_modes, arenas, trophy_dict
 
 def process_data(data, filter_dict):
     win_card_stats = {}
@@ -87,7 +93,7 @@ def process_data(data, filter_dict):
     team_trophy_count = np.array(data['team_trophy_count'])
     battle_type = np.array(data['battle_type'])
     game_mode = pd.Series(np.array(data['game_mode']))
-    arena = np.array(data['arena'])
+    arena = pd.Series(np.array(data['arena']))
     win_loss = np.array(data['win_loss'])
 
     # Find battles that were won
@@ -199,7 +205,7 @@ def process_front_page():
     battles = get_battles(player_tag)
 
     global PROCESSED_BATTLES
-    PROCESSED_BATTLES, your_team_cards, opponent_team_cards = process_battles(player_tag, battles)
+    PROCESSED_BATTLES, your_team_cards, opponent_team_cards, game_modes, arenas, trophy_dict = process_battles(player_tag, battles)
 
     cards, play_counts, win_percents, messages = process_and_return_data()
 
@@ -208,27 +214,40 @@ def process_front_page():
                    win_percents=win_percents,
                    messages=messages,
                    your_team_cards=your_team_cards,
-                   opponent_team_cards=opponent_team_cards)
+                   opponent_team_cards=opponent_team_cards,
+                   game_modes=game_modes,
+                   arenas=arenas,
+                   min_trophy=trophy_dict['min'],
+                   max_trophy=trophy_dict['max'])
 
 
 def clean_filters(raw_filter_values):
     return [i for i in raw_filter_values.split(': ') if ((i !='No Filter') and ('Contains' not in i))]
+
+def clean_trophy_filter(raw_filter_values):
+    split_vals = raw_filter_values.split(';')
+    return int(split_vals[0]), int(split_vals[1])
 
 @app.route('/filter', methods=['POST'])
 def process_filter():
     content = request.get_json()
     your_team_filter_values = clean_filters(content.get('your_team_filter'))
     opponent_team_filter_values = clean_filters(content.get('opponent_team_filter'))
+    game_mode_filter_values = clean_filters(content.get('game_mode_filter'))
+    arena_filter_values = clean_filters(content.get('arena_filter'))
+    # min_trophy, max_trophy = clean_trophy_filter(content.get('trophy_filter'))
 
     filter_dict = {
         'team_cards':your_team_filter_values,
         'opponent_cards':opponent_team_filter_values,
+        # 'team_trophy_count_range':[min_trophy, max_trophy],
         'team_trophy_count_range':[],
         'battle_time_range':[],
-        'game_modes':[],
-        'arena':[]
+        'game_modes':game_mode_filter_values,
+        'arena':arena_filter_values
     }
 
+    # TODO: Error introduced with trophy slider and filter. Bug looks to be in filtering. Not a bug, but somehow not getting any items returned?
     cards, play_counts, win_percents, messages = process_and_return_data(filter_dict)
 
     return jsonify(cards=cards,

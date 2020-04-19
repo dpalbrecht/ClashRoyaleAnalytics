@@ -19,7 +19,24 @@ $(document).on("click", ".attrib-button", function() {
     } else {
         this_dropdown.innerHTML = this_dropdown.innerHTML + ", " + clicked_attrib;
     }
+    submit_filters()
 });
+
+// function set_trophy_slider (min_val, max_val) {
+//     $("#trophy_slider").ionRangeSlider({
+//         type: "double",
+//         grid: true,
+//         min: min_val,
+//         max: max_val,
+//         from: min_val,
+//         to: max_val,
+//         prefix: ""
+//     });
+// }
+
+// $("#trophy_slider").on("change", function () {
+//     submit_filters()
+// });
 
 async function submit_filters() {
     const response = await fetch('/filter', {
@@ -27,6 +44,9 @@ async function submit_filters() {
         body: JSON.stringify({
             your_team_filter: document.getElementById("your_team_filter").children[0].innerHTML,
             opponent_team_filter: document.getElementById("opponent_team_filter").children[0].innerHTML,
+            game_mode_filter: document.getElementById("game_mode_filter").children[0].innerHTML,
+            arena_filter: document.getElementById("arena_filter").children[0].innerHTML,
+            // trophy_filter: document.getElementById('trophy_slider').value
         }),
         headers: {
             'Content-Type': 'application/json',
@@ -36,15 +56,27 @@ async function submit_filters() {
     render(data)
 }
 
-function set_filter_values (values_list, dropdown_id) {
+function set_filter_values (values_list, dropdown_id, classes) {
     result = ""
     for (i = 0; i < values_list.length; i+=1) {
-        result += "<li class=\"dropdown-item attrib-button\">"+values_list[i]+"</li>"
+        result += "<li class=\""+classes+"\">"+values_list[i]+"</li>"
     };
     document.getElementById(dropdown_id).innerHTML += result
 };
 
 function fill_filters(data) {
-    set_filter_values(data['your_team_cards'], "your_team_cards_dropdown")
-    set_filter_values(data['opponent_team_cards'], "opponent_team_cards_dropdown")
+    set_filter_values(data['your_team_cards'],
+        "your_team_cards_dropdown",
+        "dropdown-item attrib-button")
+    set_filter_values(data['opponent_team_cards'],
+        "opponent_team_cards_dropdown",
+        "dropdown-item attrib-button")
+    set_filter_values(data['game_modes'],
+        "game_mode_dropdown",
+        "dropdown-item attrib-button")
+    set_filter_values(data['arenas'],
+        "arena_dropdown",
+        "dropdown-item attrib-button")
+    // set_trophy_slider(data['min_trophy'],
+    //                   data['max_trophy'])
 }

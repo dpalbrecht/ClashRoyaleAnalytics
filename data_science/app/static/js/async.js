@@ -130,7 +130,7 @@ function render(data) {
     var n = 5;
     for (i = 0; i < cards.length; i+=n) {
         result += "<tr>"
-        for (j = i; j <= i+n; j++) {
+        for (j = i; j < i+n; j++) {
             if ((typeof cards[j] !== 'undefined') && (typeof url_dict[cards[j]] !== 'undefined')) {
                 result += "<td class=\"result_box\"><div>"+cards[j]+"</div>"
                 result += "<div><img id=\"results_image\" src="+url_dict[cards[j]]+"></div>"
