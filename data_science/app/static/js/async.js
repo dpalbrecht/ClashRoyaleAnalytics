@@ -142,4 +142,14 @@ function render(data) {
     }
     document.getElementById("stats_results").innerHTML = ""
     document.getElementById("stats_results").innerHTML += result
-}
+};
+
+function show_messages(data) {
+    messages = data['messages']
+    result = ""
+    for (i = 0; i < messages.length; i++) {
+        result += messages[i]+"<br>"
+    }
+    document.getElementById("messages_div").innerHTML = ""
+    document.getElementById("messages_div").innerHTML = result
+};

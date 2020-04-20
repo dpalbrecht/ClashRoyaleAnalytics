@@ -79,6 +79,7 @@ async function submit_filters() {
     })
     const data = await response.json()
     render(data)
+    show_messages(data)
 }
 
 function set_filter_values (values_list, dropdown_id, classes) {

@@ -1,5 +1,4 @@
 from flask import Flask, render_template, request, jsonify, abort
-import numpy as np
 import requests
 import pandas as pd
 import numpy as np
@@ -8,6 +7,7 @@ import pickle
 import os
 import itertools
 from collections import Counter
+import datetime
 
 app = Flask(__name__)
 
@@ -100,17 +100,20 @@ def process_data(data, filter_dict):
     win_inds = np.where(win_loss=='win')[0]
 
     # Find battles between battle times
-    # TODO: Make this work for a single range (last day/week/month)
     if filter_dict['battle_time_range'] == []:
         time_inds = np.array(range(len(battle_times)))
     else:
-        import pdb; pdb.set_trace()
-        # use datetime.datetime.utcnow() to find ranges based on the filter value
-        start_month, start_day, start_year = filter_dict['battle_time_range'][0].split('/')
-        start = pd.to_datetime(start_year+start_month+start_day+'T000000.000Z')
-        end_month, end_day, end_year = filter_dict['battle_time_range'][-1].split('/')
-        end = pd.to_datetime(end_year+end_month+end_day+'T235959.000Z')
+        end = datetime.datetime.now(datetime.timezone.utc)
+        if filter_dict['battle_time_range'] == 'Last Day':
+            num_days = 1
+        elif filter_dict['battle_time_range'] == 'Last Week':
+            num_days = 7
+        else:
+            num_days = 30
+        start = end - datetime.timedelta(days=num_days)
         time_inds = np.where((battle_times>=start) & (battle_times<=end))[0]
+    if len(time_inds) == 0:
+        messages.append('You have not played games within the {}.'.format(filter_dict['battle_time_range'].lower()))
 
     # Find battles that match game modes
     if filter_dict['game_modes'] == []:
@@ -138,7 +141,7 @@ def process_data(data, filter_dict):
         team_card_inds = np.array([n for n, cards in enumerate(team_cards) \
                                    if len(set(filter_dict['team_cards']).intersection(set(cards))) == len(filter_dict['team_cards'])])
     if len(team_card_inds) == 0:
-        messages.append('You have not played with this combination of cards!')
+        messages.append('You have not played with this combination of cards.')
 
     # Find battles with opponent decks containing any cards
     if filter_dict['opponent_cards'] == []:
@@ -147,7 +150,7 @@ def process_data(data, filter_dict):
         opponent_card_inds = np.array([n for n, cards in enumerate(opponent_cards) \
                                        if len(set(filter_dict['opponent_cards']).intersection(set(cards))) == len(filter_dict['opponent_cards'])])
     if len(opponent_card_inds) == 0:
-        messages.append('You have not played any opponents with this combination of cards!')
+        messages.append('You have not played any opponents with this combination of cards.')
 
     # Find intersection of all filters except wins
     all_inds = [time_inds, game_mode_inds, arena_inds, trophy_inds, team_card_inds, opponent_card_inds]
@@ -169,7 +172,7 @@ def process_data(data, filter_dict):
                 win_card_stats[card]= win_opponent_cards_dict.get(card)/count
     else:
         all_opponent_cards_dict = {}
-        messages.append('This combination of filters does not produce results. Too many filters.')
+        messages.append('This combination of filters does not produce results.')
 
     return win_card_stats, all_opponent_cards_dict, messages
 
@@ -231,6 +234,12 @@ def clean_trophy_filter(raw_filter_values):
     split_vals = raw_filter_values.split(';')
     return int(split_vals[0]), int(split_vals[1])
 
+def clean_battle_time_filter(raw_filter_values):
+    filter_values = raw_filter_values.split(': ')[1]
+    if filter_values == 'No Filter':
+        filter_values = []
+    return filter_values
+
 @app.route('/filter', methods=['POST'])
 def process_filter():
     content = request.get_json()
@@ -238,7 +247,7 @@ def process_filter():
     opponent_team_filter_values = clean_filters(content.get('opponent_team_filter'))
     game_mode_filter_values = clean_filters(content.get('game_mode_filter'))
     arena_filter_values = clean_filters(content.get('arena_filter'))
-    battle_time_filter_values = clean_filters(content.get('battle_time_filter'))[0]
+    battle_time_filter_values = clean_battle_time_filter(content.get('battle_time_filter'))
     min_trophy, max_trophy = clean_trophy_filter(content.get('trophy_filter'))
 
     filter_dict = {
