@@ -43,7 +43,6 @@ def process_battles(player_tag, battle_list):
             'team_cards':[],
             'opponent_cards':[],
             'team_trophy_count':[],
-            'battle_type':[],
             'game_mode':[],
             'arena':[],
             'win_loss':[]
@@ -52,17 +51,21 @@ def process_battles(player_tag, battle_list):
         data = pickle.loads(blob.download_as_string())
     # process battles and add to data
     for battle in battle_list:
-         # only count battles that cause a trophy change
-        if (battle['team'][0].get('trophyChange') is not None) \
-            and (battle['battleTime'] not in data['battle_time']): # make sure you don't add the same battles twice
+        # make sure you don't add the same battles twice
+        # battles in 2v2, where it's harder to get data for both teams, are excluded
+        if (battle['battleTime'] not in data['battle_time']) and ('2v2' not in battle['type']):
             data['battle_time'].append(battle['battleTime'])
             data['team_cards'].append([card['name'] for card in battle['team'][0]['cards']])
             data['opponent_cards'].append([card['name'] for card in battle['opponent'][0]['cards']])
             data['team_trophy_count'].append(battle['team'][0]['startingTrophies'])
-            data['battle_type'].append(battle['type'])
-            data['game_mode'].append(battle['gameMode']['name'])
+            data['game_mode'].append("{} - {}".format(battle['type'], battle['gameMode']['name']))
             data['arena'].append(battle['arena']['name'])
-            data['win_loss'].append(['loss' if battle['team'][0]['trophyChange'] < 0 else 'win'][0])
+            if battle['team'][0]['crowns'] > battle['opponent'][0]['crowns']:
+                data['win_loss'].append('win')
+            elif battle['team'][0]['crowns'] < battle['opponent'][0]['crowns']:
+                data['win_loss'].append('loss')
+            else:
+                assert 1 == 2
     # save to storage
     local_fname = '{}.p'.format(player_tag)
     with open(local_fname, 'wb') as f:
@@ -79,8 +82,8 @@ def process_battles(player_tag, battle_list):
     # Get all available arenas
     arenas = sorted(set(data['arena']))
     # Get min and max trophies
-    trophy_dict = {'min':min(data['team_trophy_count']),
-                   'max':max(data['team_trophy_count'])}
+    trophy_dict = {'min':str(min(data['team_trophy_count'])),
+                   'max':str(max(data['team_trophy_count']))}
 
     return data, your_team_cards, opponent_team_cards, game_modes, arenas, trophy_dict
 
@@ -91,7 +94,6 @@ def process_data(data, filter_dict):
     team_cards = np.array(data['team_cards'])
     opponent_cards = np.array(data['opponent_cards'])
     team_trophy_count = np.array(data['team_trophy_count'])
-    battle_type = np.array(data['battle_type'])
     game_mode = pd.Series(np.array(data['game_mode']))
     arena = pd.Series(np.array(data['arena']))
     win_loss = np.array(data['win_loss'])
@@ -128,11 +130,13 @@ def process_data(data, filter_dict):
         arena_inds = np.array(arena[arena.isin(filter_dict['arena'])].index)
 
     # Find battles within a given trophy range
-    if filter_dict['team_trophy_count_range'] == []:
+    if (filter_dict['team_trophy_count_range'] == []):
         trophy_inds = np.array(range(len(team_trophy_count)))
     else:
         trophy_inds = np.where((team_trophy_count>=filter_dict['team_trophy_count_range'][0]) \
                                & (team_trophy_count<=filter_dict['team_trophy_count_range'][-1]))[0]
+
+
 
     # Find battles with team decks containing specific cards
     if filter_dict['team_cards'] == []:
@@ -181,6 +185,14 @@ def process_data(data, filter_dict):
 def index():
     return render_template('index.html')
 
+def rank_results(cards, play_counts, win_percents):
+    int_play_counts = np.array(play_counts).astype(int)
+    float_win_percs = np.array(win_percents).astype(int)/100
+    ranking = np.argsort((int_play_counts/max(int_play_counts)) * float_win_percs)[::-1]
+    ranked_cards = np.array(cards)[ranking].tolist()
+    ranked_play_counts = np.array(play_counts)[ranking].tolist()
+    ranked_win_percs = np.array(win_percents)[ranking].tolist()
+    return ranked_cards, ranked_play_counts, ranked_win_percs
 
 def process_and_return_data(filter_dict=None):
     if filter_dict is None:
@@ -200,6 +212,8 @@ def process_and_return_data(filter_dict=None):
         cards.append(card)
         play_counts.append(str(int(play_count)))
         win_percents.append(str(int(processed_win_stats[card]*100)))
+
+    cards, play_counts, win_percents = rank_results(cards, play_counts, win_percents)
 
     return cards, play_counts, win_percents, messages
 
