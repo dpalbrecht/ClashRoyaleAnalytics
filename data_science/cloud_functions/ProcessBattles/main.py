@@ -1,35 +1,25 @@
 from google.cloud import storage
 import pickle
 import requests
-from google.oauth2.service_account import Credentials
-from googleapiclient.discovery import build
 import os
 
 """
-Command to deploy from cloud_functions: 
-    gcloud functions deploy proccessplayerbattlesgsheets --memory=1GB --timeout=300s --source ProcessBattlesGSheets --runtime python37 --entry-point main --project RoyaleApp --trigger-resource process_battles_gsheets --trigger-event google.pubsub.topic.publish
+This function processes a given player tag and saves data to storage.
 
+Command to deploy from cloud_functions: 
+    gcloud functions deploy proccessplayerbattles --memory=1GB --timeout=300s --source ProcessBattles --runtime python37 --trigger-http --entry-point process_battles --project RoyaleApp
 """
 
 # Globals
 # TODO: Need to set up cloud function with static IP? Can this happen? Need token that will work with this
+# TODO: After I set up static IP, get a token for it, save that in storage, and read it from there
 TOKEN = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzUxMiIsImtpZCI6IjI4YTMxOGY3LTAwMDAtYTFlYi03ZmExLTJjNzQzM2M2Y2NhNSJ9.eyJpc3MiOiJzdXBlcmNlbGwiLCJhdWQiOiJzdXBlcmNlbGw6Z2FtZWFwaSIsImp0aSI6ImQ1ZWI1Nzk0LThjZjgtNDVlNi05ZGFjLWIzYmU5ZTBkMTVjOSIsImlhdCI6MTU4NTg3NDg3MSwic3ViIjoiZGV2ZWxvcGVyLzE4OGM5NTY0LWFhYjgtZWYzNS02ZTdiLTcwZWJmZWNmMzBhNCIsInNjb3BlcyI6WyJyb3lhbGUiXSwibGltaXRzIjpbeyJ0aWVyIjoiZGV2ZWxvcGVyL3NpbHZlciIsInR5cGUiOiJ0aHJvdHRsaW5nIn0seyJjaWRycyI6WyI3Ni4xNzYuMjkuNzUiXSwidHlwZSI6ImNsaWVudCJ9XX0.mJ4gkJKHYKEbs95og1DM3OybAieXjC5ypC2dVh0IQYRviu3R9FJmyZTwC3YB0yrjvpg8NpCsZDvUDtrcwEz_IQ"
-CLIENT = storage.Client()
-BUCKET = CLIENT.bucket('royale-data')
+client = storage.Client()
+BUCKET = client.bucket('royale-data')
 
-def read_player_tags():
-    blob = BUCKET.get_blob('credentials/2020_04_23_gsheet_credentials.json')
-    blob.download_to_filename('creds.json')
-    scope = ['https://spreadsheets.google.com/feeds']
-    credentials = Credentials.from_service_account_file('creds.json', scopes=scope)
-    os.remove('creds.json')
-    service = build('sheets', 'v4', credentials=credentials)
-    sheet = service.spreadsheets()
-    result = sheet.values().get(spreadsheetId='1cmSIq5-6NI5Bn1n8WTfaVTYthxTIRUQ8aNsDTixsHno',
-                                range='Sheet1').execute()
-    return result
-
-def process_battles(player_tag):
+def process_battles(request):
+    data = request.get_json()
+    player_tag = data['player_tag']
     # read in data from storage
     # if no data, create data
     blob = BUCKET.get_blob('user_data/{}.p'.format(player_tag))
@@ -66,14 +56,8 @@ def process_battles(player_tag):
             else:
                 assert 1 == 2
     # save to storage
-    local_fname = '{}.p'.format(player_tag)
+    local_fname = '/tmp/{}.p'.format(player_tag)
     with open(local_fname, 'wb') as f:
         pickle.dump(data, f)
     BUCKET.blob('user_data/{}.p'.format(player_tag)).upload_from_file(open(local_fname, 'rb'))
     os.remove(local_fname)
-    
-def main(request):
-    result = read_player_tags()
-    for val in result['values']:
-        player_tag = val[0]
-        process_battles(player_tag)    
