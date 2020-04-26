@@ -10,7 +10,7 @@ import json
 This function triggers the AI Job that makes calls to the ProcessBattles Cloud Function.
 
 Command to deploy from cloud_functions: 
-    gcloud functions deploy trigger_process_battles_job --memory=128MB --timeout=300s --source TriggerProcessBattlesJob --runtime python37 --entry-point trigger --project RoyaleApp --trigger-resource process_battles_gsheets --trigger-event google.pubsub.topic.publish
+    gcloud functions deploy trigger_process_battles_job --memory=128MB --timeout=300s --source TriggerProcessBattlesJob --runtime python37 --entry-point trigger --project royaleapp --trigger-resource process_battles_gsheets --trigger-event google.pubsub.topic.publish
 """
 
 
