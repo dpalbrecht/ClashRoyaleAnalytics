@@ -25,7 +25,7 @@ CREDENTIALS = service_account.Credentials.from_service_account_file(
 def trigger(request):
     process_inputs = {
         'scaleTier': 'BASIC',
-        'masterConfig': {'imageUri': 'gcr.io/royaleapp/{}'.format(image_uri_name)}, #  ## TODO: build and tag image for AI Job. Place name here instead of image_uri_name
+        'masterConfig': {'imageUri': 'gcr.io/royaleapp/process-battles-job'},
         'pythonModule': 'main.py',
         'region': 'us-west2'
     }

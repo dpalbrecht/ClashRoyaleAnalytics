@@ -1,2 +1,5 @@
 google-cloud-storage==1.25.0
 google-api-python-client==1.7.11
+aiohttp==3.6.2
+nest_asyncio
+google-cloud-storage==1.25.0
