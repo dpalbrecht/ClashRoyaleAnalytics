@@ -4,11 +4,11 @@ import asyncio
 import nest_asyncio
 from google.oauth2 import service_account
 from googleapiclient.discovery import build
+from google.oauth2.service_account import Credentials
 import os
 import logging
 logging.getLogger().setLevel(logging.INFO)
 
-COUNT = 0
 
 def read_player_tags():
     client = storage.Client()
@@ -22,21 +22,25 @@ def read_player_tags():
     sheet = service.spreadsheets()
     result = sheet.values().get(spreadsheetId='1cmSIq5-6NI5Bn1n8WTfaVTYthxTIRUQ8aNsDTixsHno',
                                 range='Sheet1').execute()
-    return [tag for tag in result['values']]
+    return [tag[0] for tag in result['values']]
 
 async def call_process_battles(player_tags):
-    connector = aiohttp.TCPConnector(limit=50)
+    connector = aiohttp.TCPConnector(limit=10)
     async with aiohttp.ClientSession(connector=connector) as session:
         post_tasks = [do_post(session, player_tag) for player_tag in player_tags]      
-        await asyncio.gather(*post_tasks)
+        out = await asyncio.gather(*post_tasks)
+        return out
         
 async def do_post(session, tag):
     try:
-        async with session.post("", # TODO: Place HTTP trigger for cloud function here 
+        async with session.post("https://us-central1-royaleapp.cloudfunctions.net/proccessplayerbattles",
                                 json={'player_tag':tag}) as response:
             data = await response.text()
-            logging.info("Successfully processed player tag: {}".format(tag))
-            COUNT += 1
+            if data == 'OK':
+                logging.info("Successfully processed player tag: {}".format(tag))
+                return 1
+            else:
+                logging.info("Could not process player tag: {}".format(tag))
     except asyncio.TimeoutError:
         logging.info("asyncio TimeoutError on player tag: {}".format(tag))
 
@@ -45,8 +49,8 @@ def main():
     loop = asyncio.get_event_loop()
     player_tags = read_player_tags()
     logging.info("Beginning to process {} tags...".format(len(player_tags)))
-    loop.run_until_complete(call_process_battles(player_tags))
-    logging.info("Processed {} tags...".format(len(COUNT)))
+    success_tags = loop.run_until_complete(call_process_battles(player_tags))
+    logging.info("Successfully processed {} tags...".format(len(success_tags)))
     logging.info("Job complete!")
 
 
