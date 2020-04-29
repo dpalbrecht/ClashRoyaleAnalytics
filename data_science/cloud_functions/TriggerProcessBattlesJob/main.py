@@ -4,6 +4,8 @@ import googleapiclient.discovery
 import datetime
 from google.cloud import storage
 import json
+import logging
+logging.getLogger().setLevel(logging.INFO)
 
 
 """
@@ -16,24 +18,25 @@ Command to deploy from cloud_functions:
 
 client = storage.Client()
 bucket = client.get_bucket('royale-data')
-blob = bucket.get_blob('credentials/{}'.format(creds_fname)) ## TODO: get credentials and replace creds_fname with the name of the saved file
+blob = bucket.get_blob('credentials/2020_04_28_trigger_process_battles_job_creds.json')
 blob.download_to_filename('/tmp/creds.json')
 CREDENTIALS = service_account.Credentials.from_service_account_file(
     '/tmp/creds.json', scopes=['https://www.googleapis.com/auth/cloud-platform'])
 
 
-def trigger(request):
+def trigger(event, context):
     process_inputs = {
         'scaleTier': 'BASIC',
-        'masterConfig': {'imageUri': 'gcr.io/royaleapp/process-battles-job'},
+        'masterConfig': {'imageUri': 'gcr.io/royaleapp/process_battles_job'},
         'pythonModule': 'main.py',
         'region': 'us-west2'
     }
     job_spec = {
-        'jobId': 'process_battles_{}'.format(datetime.datetime.utcnow().strftime('%Y%m%dT%H%M%S')), 
+        'jobId': 'process_battles_job_{}'.format(datetime.datetime.utcnow().strftime('%Y%m%dT%H%M%S')), 
         'trainingInput': process_inputs
     }
     cloudml = googleapiclient.discovery.build('ml', 'v1', credentials=CREDENTIALS)
     request = cloudml.projects().jobs().create(body=job_spec, parent='projects/royaleapp')
     response = request.execute()
+    logging.info(json.dumps({'status':'success', 'response_object':response}))
     return json.dumps({'status':'success', 'response_object':response}), 200
