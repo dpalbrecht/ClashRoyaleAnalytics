@@ -18,6 +18,7 @@ async function get_data(seedValue) {
     render(data)
     fill_filters(data)
     show_number_games(data)
+    show_win_rate(data)
 }
 
 var url_dict = {'Giant': 'https://api-assets.clashroyale.com/cards/300/Axr4ox5_b7edmLsoHxBX3vmgijAIibuF6RImTbqLlXE.png',
@@ -160,6 +161,9 @@ function show_messages(data) {
 };
 
 function show_number_games(data) {
-    document.getElementById("num_games_div").innerHTML = " "
-    document.getElementById("num_games_div").innerHTML += data['num_battles']
+    document.getElementById("num_games_div").innerHTML = " " + data['num_battles']
+};
+
+function show_win_rate(data) {
+    document.getElementById("win_rate_div").innerHTML = " " + data['total_win_rate'] + "%"
 };

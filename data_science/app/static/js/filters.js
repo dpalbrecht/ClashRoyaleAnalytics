@@ -81,6 +81,7 @@ async function submit_filters() {
     render(data)
     show_messages(data)
     show_number_games(data)
+    show_win_rate(data)
 }
 
 function set_filter_values (values_list, dropdown_id, classes) {

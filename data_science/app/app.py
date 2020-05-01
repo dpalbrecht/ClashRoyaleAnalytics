@@ -8,6 +8,7 @@ import os
 import itertools
 from collections import Counter
 import datetime
+from statsmodels.stats.proportion import proportion_confint
 
 app = Flask(__name__)
 
@@ -189,6 +190,7 @@ def process_data(data, filter_dict):
         all_opponent_cards_dict = dict(Counter(itertools.chain(*opponent_cards[shared_inds])))
         all_inds.append(win_inds)
         win_shared_inds = np.array(list(set(all_inds[0]).intersection(*all_inds[1:])))
+        total_win_rate = np.round(len(win_shared_inds)/len(shared_inds)*100, 2)
         if len(win_shared_inds) != 0:
             win_opponent_cards_dict = dict(Counter(itertools.chain(*opponent_cards[win_shared_inds])))
         else:
@@ -200,9 +202,10 @@ def process_data(data, filter_dict):
                 win_card_stats[card]= win_opponent_cards_dict.get(card)/count
     else:
         all_opponent_cards_dict = {}
+        total_win_rate = 0
         messages.append('This combination of filters does not produce results.')
 
-    return win_card_stats, all_opponent_cards_dict, messages, len(shared_inds)
+    return win_card_stats, all_opponent_cards_dict, messages, len(shared_inds), total_win_rate
 
 
 @app.route('/')
@@ -213,7 +216,10 @@ def rank_results(cards, play_counts, win_percents):
     if len(cards) > 0:
         int_play_counts = np.array(play_counts).astype(int)
         float_win_percs = np.array(win_percents).astype(int)/100
-        ranking = np.argsort((int_play_counts/max(int_play_counts)) * float_win_percs)[::-1]
+        # ranking = np.argsort((int_play_counts/max(int_play_counts)) * float_win_percs)[::-1]
+        confidence_numbers = proportion_confint(np.round(float_win_percs*int_play_counts).astype(int),int_play_counts, alpha=0.05, method='wilson')[0]
+        # confidence_numbers = proportion_confint(float_win_percs*int_play_counts,int_play_counts, alpha=0.05, method='wilson')[0]
+        ranking = np.argsort(confidence_numbers)[::-1]
         ranked_cards = np.array(cards)[ranking].tolist()
         ranked_play_counts = np.array(play_counts)[ranking].tolist()
         ranked_win_percs = np.array(win_percents)[ranking].tolist()
@@ -231,7 +237,7 @@ def process_and_return_data(filter_dict=None):
             'game_modes':[],
             'arena':[]
         }
-    processed_win_stats, all_opponent_card_plays, messages, num_battles = process_data(PROCESSED_BATTLES, filter_dict)
+    processed_win_stats, all_opponent_card_plays, messages, num_battles, total_win_rate = process_data(PROCESSED_BATTLES, filter_dict)
     cards = []
     win_percents = []
     play_counts = []
@@ -242,7 +248,7 @@ def process_and_return_data(filter_dict=None):
 
     cards, play_counts, win_percents = rank_results(cards, play_counts, win_percents)
 
-    return cards, play_counts, win_percents, messages, num_battles
+    return cards, play_counts, win_percents, messages, num_battles, total_win_rate
 
 @app.route('/process', methods=['POST'])
 def process_front_page():
@@ -257,7 +263,7 @@ def process_front_page():
         global PROCESSED_BATTLES
         PROCESSED_BATTLES, your_team_cards, opponent_team_cards, game_modes, arenas, trophy_dict = process_battles(player_tag, battles)
 
-        cards, play_counts, win_percents, messages, num_battles = process_and_return_data()
+        cards, play_counts, win_percents, messages, num_battles, total_win_rate = process_and_return_data()
 
         return jsonify(cards=cards,
                        play_counts=play_counts,
@@ -269,7 +275,8 @@ def process_front_page():
                        arenas=arenas,
                        min_trophy=trophy_dict['min'],
                        max_trophy=trophy_dict['max'],
-                       num_battles=num_battles)
+                       num_battles=num_battles,
+                       total_win_rate=total_win_rate)
 
 
 def clean_filters(raw_filter_values):
@@ -304,13 +311,14 @@ def process_filter():
         'arena':arena_filter_values
     }
 
-    cards, play_counts, win_percents, messages, num_battles = process_and_return_data(filter_dict)
+    cards, play_counts, win_percents, messages, num_battles, total_win_rate = process_and_return_data(filter_dict)
 
     return jsonify(cards=cards,
                    play_counts=play_counts,
                    win_percents=win_percents,
                    messages=messages,
-                   num_battles=num_battles)
+                   num_battles=num_battles,
+                   total_win_rate=total_win_rate)
 
 
 if __name__ == '__main__':

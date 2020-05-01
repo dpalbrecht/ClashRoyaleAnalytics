@@ -33,6 +33,10 @@ table, th, td
     display: inline;
 }
 
+#win_rate_div {
+    display: inline;
+}
+
 /* FILTERS  */
 .filter_btn {
 	margin-bottom: 5px;
