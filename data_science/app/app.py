@@ -44,6 +44,20 @@ def get_battles(player_tag):
 
     return player_error_flag, profile_response, battles_response
 
+def clean_game_mode(game_mode):
+    game_mode = game_mode.replace('_', '')
+    count = 0
+    for n, m in enumerate(game_mode):
+        try:
+            test = int(m)
+            int_flag = True
+        except:
+            int_flag = False
+        if (m.isupper() or int_flag) and (n != 0):
+            game_mode = game_mode[:n+count] + ' ' + game_mode[n+count:]
+            count += 1
+    return game_mode.title().replace('  ', ' ').replace('Pv P', 'PvP').replace('2V 2', '2V2').replace('1V 1', '1V1')
+
 def process_battles(player_tag, battle_list):
     # read in data from storage
     # if no data, create data
@@ -67,18 +81,18 @@ def process_battles(player_tag, battle_list):
         # make sure you don't add the same battles twice
         # battles in 2v2, where it's harder to get data for both teams, are excluded
         if (battle['battleTime'] not in data['battle_time']) and ('2v2' not in battle['type']):
-            data['battle_time'].append(battle['battleTime'])
-            data['team_cards'].append([card['name'] for card in battle['team'][0]['cards']])
-            data['opponent_cards'].append([card['name'] for card in battle['opponent'][0]['cards']])
-            data['team_trophy_count'].append(battle['team'][0]['startingTrophies'])
-            data['game_mode'].append("{} - {}".format(battle['type'], battle['gameMode']['name']))
-            data['arena'].append(battle['arena']['name'])
             if battle['team'][0]['crowns'] > battle['opponent'][0]['crowns']:
                 data['win_loss'].append('win')
             elif battle['team'][0]['crowns'] < battle['opponent'][0]['crowns']:
                 data['win_loss'].append('loss')
             else:
-                assert 1 == 2
+                continue
+            data['battle_time'].append(battle['battleTime'])
+            data['team_cards'].append([card['name'] for card in battle['team'][0]['cards']])
+            data['opponent_cards'].append([card['name'] for card in battle['opponent'][0]['cards']])
+            data['team_trophy_count'].append(battle['team'][0]['startingTrophies'])
+            data['game_mode'].append(clean_game_mode("{} - {}".format(battle['type'], battle['gameMode']['name'])))
+            data['arena'].append(battle['arena']['name'])
     # save to storage
     local_fname = '{}.p'.format(player_tag)
     with open(local_fname, 'wb') as f:
@@ -149,8 +163,6 @@ def process_data(data, filter_dict):
         trophy_inds = np.where((team_trophy_count>=filter_dict['team_trophy_count_range'][0]) \
                                & (team_trophy_count<=filter_dict['team_trophy_count_range'][-1]))[0]
 
-
-
     # Find battles with team decks containing specific cards
     if filter_dict['team_cards'] == []:
         team_card_inds = np.array(range(len(team_cards)))
@@ -173,7 +185,6 @@ def process_data(data, filter_dict):
     all_inds = [time_inds, game_mode_inds, arena_inds, trophy_inds, team_card_inds, opponent_card_inds]
     shared_inds = np.array(list(set(all_inds[0]).intersection(*all_inds[1:])))
 
-
     if len(shared_inds) != 0:
         all_opponent_cards_dict = dict(Counter(itertools.chain(*opponent_cards[shared_inds])))
         all_inds.append(win_inds)
@@ -191,7 +202,7 @@ def process_data(data, filter_dict):
         all_opponent_cards_dict = {}
         messages.append('This combination of filters does not produce results.')
 
-    return win_card_stats, all_opponent_cards_dict, messages
+    return win_card_stats, all_opponent_cards_dict, messages, len(shared_inds)
 
 
 @app.route('/')
@@ -220,7 +231,7 @@ def process_and_return_data(filter_dict=None):
             'game_modes':[],
             'arena':[]
         }
-    processed_win_stats, all_opponent_card_plays, messages = process_data(PROCESSED_BATTLES, filter_dict)
+    processed_win_stats, all_opponent_card_plays, messages, num_battles = process_data(PROCESSED_BATTLES, filter_dict)
     cards = []
     win_percents = []
     play_counts = []
@@ -231,7 +242,7 @@ def process_and_return_data(filter_dict=None):
 
     cards, play_counts, win_percents = rank_results(cards, play_counts, win_percents)
 
-    return cards, play_counts, win_percents, messages
+    return cards, play_counts, win_percents, messages, num_battles
 
 @app.route('/process', methods=['POST'])
 def process_front_page():
@@ -246,7 +257,7 @@ def process_front_page():
         global PROCESSED_BATTLES
         PROCESSED_BATTLES, your_team_cards, opponent_team_cards, game_modes, arenas, trophy_dict = process_battles(player_tag, battles)
 
-        cards, play_counts, win_percents, messages = process_and_return_data()
+        cards, play_counts, win_percents, messages, num_battles = process_and_return_data()
 
         return jsonify(cards=cards,
                        play_counts=play_counts,
@@ -257,7 +268,8 @@ def process_front_page():
                        game_modes=game_modes,
                        arenas=arenas,
                        min_trophy=trophy_dict['min'],
-                       max_trophy=trophy_dict['max'])
+                       max_trophy=trophy_dict['max'],
+                       num_battles=num_battles)
 
 
 def clean_filters(raw_filter_values):
@@ -292,15 +304,13 @@ def process_filter():
         'arena':arena_filter_values
     }
 
-    cards, play_counts, win_percents, messages = process_and_return_data(filter_dict)
+    cards, play_counts, win_percents, messages, num_battles = process_and_return_data(filter_dict)
 
     return jsonify(cards=cards,
                    play_counts=play_counts,
                    win_percents=win_percents,
-                   messages=messages)
-
-
-
+                   messages=messages,
+                   num_battles=num_battles)
 
 
 if __name__ == '__main__':

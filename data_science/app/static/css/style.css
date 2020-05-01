@@ -29,6 +29,10 @@ table, th, td
     padding: 15px;
 }
 
+#num_games_div {
+    display: inline;
+}
+
 /* FILTERS  */
 .filter_btn {
 	margin-bottom: 5px;

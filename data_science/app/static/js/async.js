@@ -17,6 +17,7 @@ async function get_data(seedValue) {
     const data = await response.json()
     render(data)
     fill_filters(data)
+    show_number_games(data)
 }
 
 var url_dict = {'Giant': 'https://api-assets.clashroyale.com/cards/300/Axr4ox5_b7edmLsoHxBX3vmgijAIibuF6RImTbqLlXE.png',
@@ -149,11 +150,16 @@ function render(data) {
 };
 
 function show_messages(data) {
-    messages = data['messages']
+    var messages = data['messages']
     result = ""
     for (i = 0; i < messages.length; i++) {
         result += messages[i]+"<br>"
     }
     document.getElementById("messages_div").innerHTML = ""
     document.getElementById("messages_div").innerHTML = result
+};
+
+function show_number_games(data) {
+    document.getElementById("num_games_div").innerHTML = " "
+    document.getElementById("num_games_div").innerHTML += data['num_battles']
 };
