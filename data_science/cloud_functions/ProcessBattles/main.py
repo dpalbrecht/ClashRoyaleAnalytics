@@ -21,6 +21,20 @@ BUCKET = client.bucket('royale-data')
 blob = BUCKET.get_blob('credentials/2020_04_26_clash_token_static.txt')
 TOKEN = blob.download_as_string().decode('utf-8')
 
+def clean_game_mode(game_mode):
+    game_mode = game_mode.replace('_', '')
+    count = 0
+    for n, m in enumerate(game_mode):
+        try:
+            test = int(m)
+            int_flag = True
+        except:
+            int_flag = False
+        if (m.isupper() or int_flag) and (n != 0):
+            game_mode = game_mode[:n+count] + ' ' + game_mode[n+count:]
+            count += 1
+    return game_mode.title().replace('  ', ' ').replace('Pv P', 'PvP').replace('2V 2', '2V2').replace('1V 1', '1V1')
+
 def process_battles(request):
     data = request.get_json()
     player_tag = data['player_tag']
@@ -59,7 +73,7 @@ def process_battles(request):
             data['team_cards'].append([card['name'] for card in battle['team'][0]['cards']])
             data['opponent_cards'].append([card['name'] for card in battle['opponent'][0]['cards']])
             data['team_trophy_count'].append(battle['team'][0]['startingTrophies'])
-            data['game_mode'].append("{} - {}".format(battle['type'], battle['gameMode']['name']))
+            data['game_mode'].append(clean_game_mode("{} - {}".format(battle['type'], battle['gameMode']['name'])))
             data['arena'].append(battle['arena']['name'])
     logging.info('data length after processing: {}'.format(len(data['win_loss'])))
     # save to storage
