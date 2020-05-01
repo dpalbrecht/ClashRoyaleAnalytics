@@ -186,13 +186,16 @@ def index():
     return render_template('index.html')
 
 def rank_results(cards, play_counts, win_percents):
-    int_play_counts = np.array(play_counts).astype(int)
-    float_win_percs = np.array(win_percents).astype(int)/100
-    ranking = np.argsort((int_play_counts/max(int_play_counts)) * float_win_percs)[::-1]
-    ranked_cards = np.array(cards)[ranking].tolist()
-    ranked_play_counts = np.array(play_counts)[ranking].tolist()
-    ranked_win_percs = np.array(win_percents)[ranking].tolist()
-    return ranked_cards, ranked_play_counts, ranked_win_percs
+    if len(cards) > 0:
+        int_play_counts = np.array(play_counts).astype(int)
+        float_win_percs = np.array(win_percents).astype(int)/100
+        ranking = np.argsort((int_play_counts/max(int_play_counts)) * float_win_percs)[::-1]
+        ranked_cards = np.array(cards)[ranking].tolist()
+        ranked_play_counts = np.array(play_counts)[ranking].tolist()
+        ranked_win_percs = np.array(win_percents)[ranking].tolist()
+        return ranked_cards, ranked_play_counts, ranked_win_percs
+    else:
+        return cards, play_counts, win_percents
 
 def process_and_return_data(filter_dict=None):
     if filter_dict is None:
