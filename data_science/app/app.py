@@ -14,8 +14,9 @@ app = Flask(__name__)
 
 @app.before_first_request
 def load_vars():
-    global TOKEN, CLIENT, BUCKET
+    global TOKEN, CLIENT, BUCKET, HEADER
     TOKEN = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzUxMiIsImtpZCI6IjI4YTMxOGY3LTAwMDAtYTFlYi03ZmExLTJjNzQzM2M2Y2NhNSJ9.eyJpc3MiOiJzdXBlcmNlbGwiLCJhdWQiOiJzdXBlcmNlbGw6Z2FtZWFwaSIsImp0aSI6ImQ1ZWI1Nzk0LThjZjgtNDVlNi05ZGFjLWIzYmU5ZTBkMTVjOSIsImlhdCI6MTU4NTg3NDg3MSwic3ViIjoiZGV2ZWxvcGVyLzE4OGM5NTY0LWFhYjgtZWYzNS02ZTdiLTcwZWJmZWNmMzBhNCIsInNjb3BlcyI6WyJyb3lhbGUiXSwibGltaXRzIjpbeyJ0aWVyIjoiZGV2ZWxvcGVyL3NpbHZlciIsInR5cGUiOiJ0aHJvdHRsaW5nIn0seyJjaWRycyI6WyI3Ni4xNzYuMjkuNzUiXSwidHlwZSI6ImNsaWVudCJ9XX0.mJ4gkJKHYKEbs95og1DM3OybAieXjC5ypC2dVh0IQYRviu3R9FJmyZTwC3YB0yrjvpg8NpCsZDvUDtrcwEz_IQ"
+    HEADER = {"Authorization": "Bearer {}".format(TOKEN)}
     try:
         CLIENT = storage.Client()
     except:
@@ -24,12 +25,24 @@ def load_vars():
 
 
 def get_battles(player_tag):
-    # TODO: Need error handling here
+    # Clean input tag
+    player_error_flag = False
     if player_tag.startswith('#'):
         player_tag = player_tag[1:]
-    response = requests.get('https://api.clashroyale.com/v1/players/%23{}/battlelog'.format(player_tag),
-                            headers={"Authorization": "Bearer {}".format(TOKEN)})
-    return eval(response.text.replace('false', 'False').replace('true', 'True'))
+
+    # Get battle profile and check for errors
+    profile_response = requests.get('https://api.clashroyale.com/v1/players/%23{}'.format(player_tag),
+        headers=HEADER)
+    profile_response = eval(profile_response.text.replace('false', 'False').replace('true', 'True').replace('null','None'))
+    if profile_response.get('tag') is None:
+        player_error_flag = True
+
+    # Get battle logs
+    battles_response = requests.get('https://api.clashroyale.com/v1/players/%23{}/battlelog'.format(player_tag),
+        headers=HEADER)
+    battles_response = eval(battles_response.text.replace('false', 'False').replace('true', 'True'))
+
+    return player_error_flag, profile_response, battles_response
 
 def process_battles(player_tag, battle_list):
     # read in data from storage
@@ -225,23 +238,26 @@ def process_front_page():
     content = request.get_json()
     player_tag = content.get('player_tag')
 
-    battles = get_battles(player_tag)
+    player_error_flag, player_profile, battles = get_battles(player_tag)
 
-    global PROCESSED_BATTLES
-    PROCESSED_BATTLES, your_team_cards, opponent_team_cards, game_modes, arenas, trophy_dict = process_battles(player_tag, battles)
+    if player_error_flag:
+        return jsonify(player_error_flag=player_error_flag)
+    else:
+        global PROCESSED_BATTLES
+        PROCESSED_BATTLES, your_team_cards, opponent_team_cards, game_modes, arenas, trophy_dict = process_battles(player_tag, battles)
 
-    cards, play_counts, win_percents, messages = process_and_return_data()
+        cards, play_counts, win_percents, messages = process_and_return_data()
 
-    return jsonify(cards=cards,
-                   play_counts=play_counts,
-                   win_percents=win_percents,
-                   messages=messages,
-                   your_team_cards=your_team_cards,
-                   opponent_team_cards=opponent_team_cards,
-                   game_modes=game_modes,
-                   arenas=arenas,
-                   min_trophy=trophy_dict['min'],
-                   max_trophy=trophy_dict['max'])
+        return jsonify(cards=cards,
+                       play_counts=play_counts,
+                       win_percents=win_percents,
+                       messages=messages,
+                       your_team_cards=your_team_cards,
+                       opponent_team_cards=opponent_team_cards,
+                       game_modes=game_modes,
+                       arenas=arenas,
+                       min_trophy=trophy_dict['min'],
+                       max_trophy=trophy_dict['max'])
 
 
 def clean_filters(raw_filter_values):
