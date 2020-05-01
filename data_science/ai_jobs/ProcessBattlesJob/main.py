@@ -13,16 +13,9 @@ logging.getLogger().setLevel(logging.INFO)
 def read_player_tags():
     client = storage.Client()
     bucket = client.bucket('royale-data')
-    blob = bucket.get_blob('credentials/2020_04_23_gsheet_credentials.json')
-    creds_fname = '/tmp/creds.json'
-    blob.download_to_filename(creds_fname)
-    credentials = Credentials.from_service_account_file(creds_fname, scopes=['https://spreadsheets.google.com/feeds'])
-    os.remove(creds_fname)
-    service = build('sheets', 'v4', credentials=credentials)
-    sheet = service.spreadsheets()
-    result = sheet.values().get(spreadsheetId='1cmSIq5-6NI5Bn1n8WTfaVTYthxTIRUQ8aNsDTixsHno',
-                                range='Sheet1').execute()
-    return [tag[0] for tag in result['values']]
+    blobs = bucket.list_blobs(prefix='user_data')
+    player_tags = [blob.name.split('/')[1][:-2] for blob in blobs if blob.name.endswith('.p')]
+    return player_tags
 
 async def call_process_battles(player_tags):
     connector = aiohttp.TCPConnector(limit=10)
