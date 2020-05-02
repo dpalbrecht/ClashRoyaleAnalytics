@@ -1,0 +1,103 @@
+{% extends "layout.html" %}
+{% block content %}
+<div class="row hl" id="attribs-row">
+	<div class="col-sm-12">
+		<div id="button-group-label-attribs"><h4>Filter your results:</h4></div>
+		<!-- <div class="dropdown" id="your_team_filter">
+			<button
+				class="btn btn-secondary dropdown-toggle filter_btn"
+				type="button" id="dropdownMenuButton"
+				data-toggle="dropdown" aria-haspopup="true"
+				aria-expanded="false"
+			>
+			Your Deck Contains: No Filter</button>
+			<ul
+				class="dropdown-menu"
+				id="your_team_cards_dropdown"
+				aria-labelledby="dropdownMenuButton"
+			>
+			</ul>
+		</div>
+		<div class="dropdown" id="opponent_team_filter">
+			<button
+				class="btn btn-secondary dropdown-toggle filter_btn"
+				type="button" id="dropdownMenuButton"
+				data-toggle="dropdown" aria-haspopup="true"
+				aria-expanded="false"
+			>
+			Opponent's Deck Contains: No Filter</button>
+			<ul
+				class="dropdown-menu"
+				id="opponent_team_cards_dropdown"
+				aria-labelledby="dropdownMenuButton"
+			>
+			</ul>
+		</div>
+		<div class="dropdown" id="game_mode_filter">
+			<button
+				class="btn btn-secondary dropdown-toggle filter_btn"
+				type="button" id="dropdownMenuButton"
+				data-toggle="dropdown" aria-haspopup="true"
+				aria-expanded="false"
+			>
+			Game Mode: No Filter</button>
+			<ul
+				class="dropdown-menu"
+				id="game_mode_dropdown"
+				aria-labelledby="dropdownMenuButton"
+			>
+			</ul>
+		</div>
+		<div class="dropdown" id="arena_filter">
+			<button
+				class="btn btn-secondary dropdown-toggle filter_btn"
+				type="button" id="dropdownMenuButton"
+				data-toggle="dropdown" aria-haspopup="true"
+				aria-expanded="false"
+			>
+			Arena: No Filter</button>
+			<ul
+				class="dropdown-menu"
+				id="arena_dropdown"
+				aria-labelledby="dropdownMenuButton"
+			>
+			</ul>
+		</div>
+		<div class="dropdown" id="battle_time_filter">
+			<button
+				class="btn btn-secondary dropdown-toggle filter_btn"
+				type="button" id="dropdownMenuButton"
+				data-toggle="dropdown" aria-haspopup="true"
+				aria-expanded="false"
+			>
+			Battle Time: No Filter</button>
+			<ul
+				class="dropdown-menu"
+				id="battle_time_dropdown"
+				aria-labelledby="dropdownMenuButton"
+			>
+				<li class="dropdown-item attrib-button-single">Last Day</li>
+				<li class="dropdown-item attrib-button-single">Last Week</li>
+				<li class="dropdown-item attrib-button-single">Last Month</li>
+			</ul>
+		</div> -->
+		<div id="trophy_range_div">
+			<div>Trophy Range:</div>
+			<input type="text" id="trophy_slider" value="" />
+		</div>
+		<!-- <div>
+			Messages:
+			<div id="messages_div"></div>
+		</div> -->
+		<div>
+			Overall Win Rate: {{ total_win_rate }}%
+		</div>
+		<div>
+			Number of Games Analyzed: {{ num_battles }}
+		</div>
+	</div>
+</div>
+
+<div id="stats_results">
+</div>
+{% endblock %}

@@ -1,0 +1,91 @@
+#result_div
+{
+    margin: 10px 50% 10px 0;
+}
+
+#results_image
+{
+    width:100px;
+    height:100px;
+}
+
+table, th, td
+{
+  border: 1px solid black;
+}
+
+#top_form
+{
+    margin: 10px 3px 30px 0px;
+}
+
+#seedInput
+{
+    margin: 0px 3px 0px 0px;
+}
+
+.result_box
+{
+    padding: 15px;
+}
+
+#num_games_div {
+    display: inline;
+}
+
+#win_rate_div {
+    display: inline;
+}
+
+/* FILTERS  */
+.filter_btn {
+	margin-bottom: 5px;
+}
+.attrib-button:hover {
+	background: lightgray;
+	cursor: pointer;
+}
+.attrib-button {
+	padding-left: 5px;
+}
+.attrib-button-single:hover {
+	background: lightgray;
+	cursor: pointer;
+}
+.attrib-button-single {
+	padding-left: 5px;
+}
+#submit_filters_btn {
+    margin: 10px 10px 10px 0px
+}
+.slider {
+  -webkit-appearance: none;
+  width: 30%;
+  height: 25px;
+  background: #d3d3d3;
+  outline: none;
+  opacity: 0.7;
+  -webkit-transition: .2s;
+  transition: opacity .2s;
+}
+.slider:hover {
+  opacity: 1;
+}
+.slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 25px;
+  height: 25px;
+  background: #4CAF50;
+  cursor: pointer;
+}
+.slider::-moz-range-thumb {
+  width: 25px;
+  height: 25px;
+  background: #4CAF50;
+  cursor: pointer;
+}
+#trophy_range_div {
+    width: 30%;
+    margin-bottom: 10px;
+}
