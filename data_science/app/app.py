@@ -77,6 +77,7 @@ def process_battles(player_tag, battle_list):
         }
     else:
         data = pickle.loads(blob.download_as_string())
+
     # process battles and add to data
     for battle in battle_list:
         # make sure you don't add the same battles twice
