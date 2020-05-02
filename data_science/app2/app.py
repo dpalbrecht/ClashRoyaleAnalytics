@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, jsonify, abort, redirect, url_for
+from flask import Flask, render_template, request, jsonify, abort
 import requests
 import pandas as pd
 import numpy as np
@@ -77,6 +77,7 @@ def process_battles(player_tag, battle_list):
         }
     else:
         data = pickle.loads(blob.download_as_string())
+
     # process battles and add to data
     for battle in battle_list:
         # make sure you don't add the same battles twice
@@ -210,8 +211,7 @@ def process_data(data, filter_dict):
 
 @app.route('/')
 def index():
-    return render_template('home.html')
-
+    return render_template('index.html')
 
 def rank_results(cards, play_counts, win_percents):
     if len(cards) > 0:
@@ -251,16 +251,14 @@ def process_and_return_data(filter_dict=None):
 
     return cards, play_counts, win_percents, messages, num_battles, total_win_rate
 
-@app.route('/process', methods=['POST', 'GET'])
+@app.route('/process', methods=['POST'])
 def process_front_page():
     content = request.get_json()
     player_tag = content.get('player_tag')
-    # player_tag = request.form['player_tag']
 
     player_error_flag, player_profile, battles = get_battles(player_tag)
 
     if player_error_flag:
-        # TODO: This is where we have a pop up on home.html
         return jsonify(player_error_flag=player_error_flag)
     else:
         global PROCESSED_BATTLES
@@ -268,22 +266,18 @@ def process_front_page():
 
         cards, play_counts, win_percents, messages, num_battles, total_win_rate = process_and_return_data()
 
-        # TODO: This is where the Jinja template comes in to render processed_battles.html
-        return jsonify(template=render_template('processed_battles.html',
-                               cards=cards,
-                               play_counts=play_counts,
-                               win_percents=win_percents,
-                               messages=messages,
-                               your_team_cards=your_team_cards,
-                               opponent_team_cards=opponent_team_cards,
-                               game_modes=game_modes,
-                               arenas=arenas,
-                               min_trophy=trophy_dict['min'],
-                               max_trophy=trophy_dict['max'],
-                               num_battles=num_battles,
-                               total_win_rate=total_win_rate),
-                        min_trophy=trophy_dict['min'],
-                        max_trophy=trophy_dict['max'])
+        return jsonify(cards=cards,
+                       play_counts=play_counts,
+                       win_percents=win_percents,
+                       messages=messages,
+                       your_team_cards=your_team_cards,
+                       opponent_team_cards=opponent_team_cards,
+                       game_modes=game_modes,
+                       arenas=arenas,
+                       min_trophy=trophy_dict['min'],
+                       max_trophy=trophy_dict['max'],
+                       num_battles=num_battles,
+                       total_win_rate=total_win_rate)
 
 
 def clean_filters(raw_filter_values):

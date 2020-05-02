@@ -1,37 +1,27 @@
 $(document).on('submit', '#form', (event) => {
     event.preventDefault()
     const seedValue = $('#seedInput').val()
-    // get_data(seedValue)
-    $.ajax({
-            type: 'POST',
-            url: '/process',
-            data: JSON.stringify({'player_tag':seedValue}),
-            contentType: 'application/json',
-            success: function(response){
-                document.write(response.template);
-                // $(document).ready(function(){set_trophy_slider(response.min_trophy, response.max_trophy)});
-                // $(window).load(function(){set_trophy_slider(response.min_trophy, response.max_trophy)});
-                set_trophy_slider(response.min_trophy, response.max_trophy)
-            }
-    });
+    get_data(seedValue)
 })
 
-// async function get_data(seedValue) {
-//     const response = await fetch('/process', {
-//         method: 'POST',
-//         body: JSON.stringify({
-//             player_tag: seedValue,
-//         }),
-//         headers: {
-//             'Content-Type': 'application/json',
-//         },
-//     })
-//     const data = await response.json()
-//     render(data)
-//     fill_filters(data)
-//     show_number_games(data)
-//     show_win_rate(data)
-// }
+async function get_data(seedValue) {
+    const response = await fetch('/process', {
+        method: 'POST',
+        body: JSON.stringify({
+            player_tag: seedValue,
+        }),
+        headers: {
+            'Content-Type': 'application/json',
+        },
+    })
+    const data = await response.json()
+    render(data)
+    document.getElementById("main_container").style.display = "none";
+    document.getElementById("results_container").style.display = "inherit";
+    fill_filters(data)
+    show_number_games(data)
+    show_win_rate(data)
+}
 
 var url_dict = {'Giant': 'https://api-assets.clashroyale.com/cards/300/Axr4ox5_b7edmLsoHxBX3vmgijAIibuF6RImTbqLlXE.png',
  'Skeletons': 'https://api-assets.clashroyale.com/cards/300/oO7iKMU5m0cdxhYPZA3nWQiAUh2yoGgdThLWB1rVSec.png',

@@ -1,3 +1,43 @@
+/* BANNER */
+#banner_container {
+    font-family: clashFont;
+    text-align: center;
+    margin: 0% 10% 5% 10%;
+    border-radius: 25px;
+    border: 2px solid black;
+    padding: 5%;
+    background-color: rgba(0, 0, 0, 0.5);
+    color: white;
+}
+
+#main_container {
+    font-family: clashFont;
+    text-align: center;
+    margin: 3% 10% 5% 10%;
+    border-radius: 25px;
+    border: 2px solid black;
+    padding: 5%;
+    background-color: rgba(0, 0, 0, 0.5);
+    color: white;
+}
+
+#background_container {
+    background-image: url('../clash_bg.png');
+	background-position:center;
+	background-repeat:no-repeat;
+	background-size:cover;
+    height: 100vh;
+}
+
+@font-face {
+  font-family: 'clashFont';
+  src: url('../You Blockhead.ttf');
+}
+
+.smaller_font {
+    font-size: 12px
+}
+
 #result_div
 {
     margin: 10px 50% 10px 0;
@@ -14,9 +54,10 @@ table, th, td
   border: 1px solid black;
 }
 
-#top_form
-{
-    margin: 10px 3px 30px 0px;
+#top_form {
+    text-align: center;
+    justify-content: center;
+    margin-top: 3%;
 }
 
 #seedInput
@@ -35,6 +76,10 @@ table, th, td
 
 #win_rate_div {
     display: inline;
+}
+
+#results_container {
+    display:none;
 }
 
 /* FILTERS  */

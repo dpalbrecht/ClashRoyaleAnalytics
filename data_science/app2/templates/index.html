@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Competition Clash</title>
+
+	<script src="https://code.jquery.com/jquery-1.9.1.js"></script>
+  	<script src="https://code.jquery.com/ui/1.9.2/jquery-ui.js"></script>
+  	<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/5.5.0/d3.min.js"></script>
+
+	<!-- Latest compiled and minified CSS -->
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/css/bootstrap.min.css" integrity="sha384-PsH8R72JQ3SOdhVi3uxftmaW6Vc51MKb0q5P2rRUpPvrszuE4W1povHYgTpBfshb" crossorigin="anonymous">
+	<link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+	<link rel="stylesheet" href="{{ url_for('static', filename='css/c3.css') }}">
+
+</head>
+<body>
+	<div id="background_container">
+
+		<div class="container" id="banner_container">
+			<div class="row text-wrap">
+				<div class="col">
+					<h1 class="center">Welcome to Competition Clash!</h1>
+					The website dedicated to analyzing your Clash Royale battles to show you how well you play against certain cards.
+				</div>
+			</div>
+		</div>
+
+		<div class="container" id="main_container">
+			<div class="row text-wrap">
+				<div class="col">
+					<div id="message">
+						<h2>Enter your player tag:</h2>
+						<div class="smaller_font">
+							We'll start collecting all 1v1 battle data from all game modes every day.
+							<br>
+							Just keep playing and you'll be able to see how you've been doing overall.
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<div class="row" id="top_form">
+				<form class="form-inline" id="form">
+				  <div class="form-group">
+				  </div>
+				  <div class="form-group">
+				    <label class="sr-only" for="seedInput">Name</label>
+				    <input
+				    	type="text"
+				    	class="form-control"
+				    	id="seedInput"
+				    	placeholder="Player Tag"
+				    >
+				  </div>
+				  <button type="submit" class="btn btn-primary">Analyze My Battles!</button>
+				</form>
+			</div>
+		</div>
+
+		<div class="container" id="results_container">
+			<div class="row hl" id="attribs-row">
+				<div class="col-sm-12">
+					<div id="button-group-label-attribs"><h4>Filter your results:</h4></div>
+					<div class="dropdown" id="your_team_filter">
+						<button
+							class="btn btn-secondary dropdown-toggle filter_btn"
+							type="button" id="dropdownMenuButton"
+							data-toggle="dropdown" aria-haspopup="true"
+							aria-expanded="false"
+						>
+						Your Deck Contains: No Filter</button>
+						<ul
+							class="dropdown-menu"
+							id="your_team_cards_dropdown"
+							aria-labelledby="dropdownMenuButton"
+						>
+						</ul>
+					</div>
+					<div class="dropdown" id="opponent_team_filter">
+						<button
+							class="btn btn-secondary dropdown-toggle filter_btn"
+							type="button" id="dropdownMenuButton"
+							data-toggle="dropdown" aria-haspopup="true"
+							aria-expanded="false"
+						>
+						Opponent's Deck Contains: No Filter</button>
+						<ul
+							class="dropdown-menu"
+							id="opponent_team_cards_dropdown"
+							aria-labelledby="dropdownMenuButton"
+						>
+						</ul>
+					</div>
+					<div class="dropdown" id="game_mode_filter">
+						<button
+							class="btn btn-secondary dropdown-toggle filter_btn"
+							type="button" id="dropdownMenuButton"
+							data-toggle="dropdown" aria-haspopup="true"
+							aria-expanded="false"
+						>
+						Game Mode: No Filter</button>
+						<ul
+							class="dropdown-menu"
+							id="game_mode_dropdown"
+							aria-labelledby="dropdownMenuButton"
+						>
+						</ul>
+					</div>
+					<div class="dropdown" id="arena_filter">
+						<button
+							class="btn btn-secondary dropdown-toggle filter_btn"
+							type="button" id="dropdownMenuButton"
+							data-toggle="dropdown" aria-haspopup="true"
+							aria-expanded="false"
+						>
+						Arena: No Filter</button>
+						<ul
+							class="dropdown-menu"
+							id="arena_dropdown"
+							aria-labelledby="dropdownMenuButton"
+						>
+						</ul>
+					</div>
+					<div class="dropdown" id="battle_time_filter">
+						<button
+							class="btn btn-secondary dropdown-toggle filter_btn"
+							type="button" id="dropdownMenuButton"
+							data-toggle="dropdown" aria-haspopup="true"
+							aria-expanded="false"
+						>
+						Battle Time: No Filter</button>
+						<ul
+							class="dropdown-menu"
+							id="battle_time_dropdown"
+							aria-labelledby="dropdownMenuButton"
+						>
+							<li class="dropdown-item attrib-button-single">Last Day</li>
+							<li class="dropdown-item attrib-button-single">Last Week</li>
+							<li class="dropdown-item attrib-button-single">Last Month</li>
+						</ul>
+					</div>
+					<div id="trophy_range_div">
+						<div>Trophy Range:</div>
+						<input type="text" id="trophy_slider" value="" />
+					</div>
+					<div>
+						Messages:
+						<div id="messages_div"></div>
+					</div>
+					<div>
+						Overall Win Rate:<div id="win_rate_div"></div>
+					</div>
+					<div>
+						Number of Games Analyzed:<div id="num_games_div"></div>
+					</div>
+				</div>
+			</div>
+
+			<div id="stats_results">
+			</div>
+		</div>
+
+	</div>
+
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/ion-rangeslider/2.3.1/css/ion.rangeSlider.min.css"/>
+	<!-- Latest compiled and minified JavaScript -->
+	<script src="https://code.jquery.com/jquery-3.4.1.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/ion-rangeslider/2.3.1/js/ion.rangeSlider.min.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+	<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+	<script src="{{ url_for('static', filename='js/async.js') }}"></script>
+	<script src="{{ url_for('static', filename='js/filters.js') }}"></script>
+	<script src="{{ url_for('static', filename='js/c3.min.js') }}"></script>
+
+</body>
+</html>
