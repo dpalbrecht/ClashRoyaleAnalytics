@@ -127,26 +127,45 @@ function render(data) {
         // Show error if player tag didn't exist
         document.getElementById("main_container").innerHTML = "The player tag you entered is not correct :( please try again!"
     } else {
+        document.getElementById("page_header").innerHTML = "Check out your results!"
+        document.getElementById("page_subheader").innerHTML = "Use the filters and see how well you've been playing."
+
         // Show results
         var cards = data['cards']
         var play_counts = data['play_counts']
         var win_percents = data['win_percents']
         var messages = data['messages']
 
-        var result = "<table>"
+        // var result = "<table id=\"results_table\">"
+        // var n = 5;
+        // for (i = 0; i < cards.length; i+=n) {
+        //     result += "<tr>"
+        //     for (j = i; j < i+n; j++) {
+        //         if ((typeof cards[j] !== 'undefined') && (typeof url_dict[cards[j]] !== 'undefined')) {
+        //             result += "<td class=\"result_box\"><div>"+cards[j]+"</div>"
+        //             result += "<div><img id=\"results_image\" src="+url_dict[cards[j]]+"></div>"
+        //             result += "<div>Play Count: "+play_counts[j]+"</div>"
+        //             result += "<div>Win Rate: "+win_percents[j]+"%</div></td>"
+        //         }
+        //     }
+        //     result += "</tr>"
+        // }
+
+        var result = "<div id=\"results_table\">"
         var n = 5;
         for (i = 0; i < cards.length; i+=n) {
-            result += "<tr>"
+            result += "<div class=\"row\">"
             for (j = i; j < i+n; j++) {
                 if ((typeof cards[j] !== 'undefined') && (typeof url_dict[cards[j]] !== 'undefined')) {
-                    result += "<td class=\"result_box\"><div>"+cards[j]+"</div>"
+                    result += "<div class=\"col border result_box\"><div>"+cards[j]+"</div>"
                     result += "<div><img id=\"results_image\" src="+url_dict[cards[j]]+"></div>"
                     result += "<div>Play Count: "+play_counts[j]+"</div>"
-                    result += "<div>Win Rate: "+win_percents[j]+"%</div></td>"
+                    result += "<div>Win Rate: "+win_percents[j]+"%</div></div>"
                 }
             }
-            result += "</tr>"
+            result += "</div>"
         }
+
         document.getElementById("stats_results").innerHTML = ""
         document.getElementById("stats_results").innerHTML += result
     };
