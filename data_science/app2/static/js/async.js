@@ -136,35 +136,29 @@ function render(data) {
         var win_percents = data['win_percents']
         var messages = data['messages']
 
-        // var result = "<table id=\"results_table\">"
+        // var result = "<div id=\"results_table\">"
         // var n = 5;
         // for (i = 0; i < cards.length; i+=n) {
-        //     result += "<tr>"
+        //     result += "<div class=\"row\">"
         //     for (j = i; j < i+n; j++) {
         //         if ((typeof cards[j] !== 'undefined') && (typeof url_dict[cards[j]] !== 'undefined')) {
-        //             result += "<td class=\"result_box\"><div>"+cards[j]+"</div>"
+        //             result += "<div class=\"col result_box\"><div>"+cards[j]+"</div>"
         //             result += "<div><img id=\"results_image\" src="+url_dict[cards[j]]+"></div>"
         //             result += "<div>Play Count: "+play_counts[j]+"</div>"
-        //             result += "<div>Win Rate: "+win_percents[j]+"%</div></td>"
+        //             result += "<div>Win Rate: "+win_percents[j]+"%</div></div>"
         //         }
         //     }
-        //     result += "</tr>"
+        //     result += "</div>"
         // }
 
-        var result = "<div id=\"results_table\">"
-        var n = 5;
-        for (i = 0; i < cards.length; i+=n) {
-            result += "<div class=\"row\">"
-            for (j = i; j < i+n; j++) {
-                if ((typeof cards[j] !== 'undefined') && (typeof url_dict[cards[j]] !== 'undefined')) {
-                    result += "<div class=\"col border result_box\"><div>"+cards[j]+"</div>"
-                    result += "<div><img id=\"results_image\" src="+url_dict[cards[j]]+"></div>"
-                    result += "<div>Play Count: "+play_counts[j]+"</div>"
-                    result += "<div>Win Rate: "+win_percents[j]+"%</div></div>"
-                }
-            }
-            result += "</div>"
+        var result = "<div id=\"row results_table\"><div id=\"results_div\">"
+        for (i = 0; i < cards.length; i+=1) {
+                result += "<div class=\"col result_box\"><div>"+cards[i]+"</div>"
+                result += "<div><img id=\"results_image\" src="+url_dict[cards[i]]+"></div>"
+                result += "<div>Play Count: "+play_counts[i]+"</div>"
+                result += "<div>Win Rate: "+win_percents[i]+"%</div></div>"
         }
+        result += "</div></div>"
 
         document.getElementById("stats_results").innerHTML = ""
         document.getElementById("stats_results").innerHTML += result
