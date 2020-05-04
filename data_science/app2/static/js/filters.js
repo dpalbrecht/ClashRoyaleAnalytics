@@ -108,3 +108,21 @@ function fill_filters(data) {
     set_trophy_slider(data['min_trophy'],
                       data['max_trophy'])
 }
+
+
+// NEW filters
+$('#select-country-index').selectize({
+	sortField: 'text',
+	maxItems: 1,
+	onChange: function () {
+        // trigger filters on change with current values
+    }
+});
+
+// take this out of a function so it just gets triggered like the trophy filter
+function create_selectize_menu_index(destinations){
+    for (i = 0; i < destinations.length; i++) {
+        $("#select-country-index")[0].selectize.addOption({value:destinations[i],
+                                                           text:destinations[i]});
+    };
+};
