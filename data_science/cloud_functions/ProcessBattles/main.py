@@ -56,26 +56,54 @@ def process_battles(request):
     # process battles and add to data
     response = requests.get('https://api.clashroyale.com/v1/players/%23{}/battlelog'.format(player_tag),
                             headers={"Authorization": "Bearer {}".format(TOKEN)})
-    logging.info('data length before processing: {}'.format(len(data['win_loss'])))
+    before_data_length = len(data['win_loss'])
     battle_list = eval(response.text.replace('false', 'False').replace('true', 'True'))
+    
+    # process battles and add to data
+    # handle errors by skipping battles
     for battle in battle_list:
         # make sure you don't add the same battles twice
         # battles in 2v2, where it's harder to get data for both teams, are excluded
-        if (battle['battleTime'] not in data['battle_time']) and ('2v2' not in battle['type']):
-            if battle['team'][0]['crowns'] > battle['opponent'][0]['crowns']:
-                data['win_loss'].append('win')
-            elif battle['team'][0]['crowns'] < battle['opponent'][0]['crowns']:
-                data['win_loss'].append('loss')
-            else:
-                logging.info('Player tag {} had a battle at {} where neither player had more crowns.'.format(player_tag, battle['battleTime']))
-                continue
-            data['battle_time'].append(battle['battleTime'])
-            data['team_cards'].append([card['name'] for card in battle['team'][0]['cards']])
-            data['opponent_cards'].append([card['name'] for card in battle['opponent'][0]['cards']])
-            data['team_trophy_count'].append(battle['team'][0]['startingTrophies'])
-            data['game_mode'].append(clean_game_mode("{} - {}".format(battle['type'], battle['gameMode']['name'])))
-            data['arena'].append(battle['arena']['name'])
-    logging.info('data length after processing: {}'.format(len(data['win_loss'])))
+        battle_times = data['battle_time']
+        try:
+            if (battle['battleTime'] not in battle_times) and ('2v2' not in battle['type']):
+                if battle['team'][0]['crowns'] > battle['opponent'][0]['crowns']:
+                    win_loss = 'win'
+                elif battle['team'][0]['crowns'] < battle['opponent'][0]['crowns']:
+                    win_loss = 'loss'
+                else:
+                    logging.info('Player tag {} had a battle at {} where neither player had more crowns.'.format(player_tag, battle.get('battleTime')))
+                    assert 1 == 2
+
+                # if the battle is a tournament, take the last available trophy count
+                if battle['type'] == 'tournament':
+                    if len(data['team_trophy_count']) > 0:
+                        team_trophy_count = data['team_trophy_count'][-1]
+                    else:
+                        team_trophy_count = battle['team'][0]['startingTrophies']
+                    if team_trophy_count is None:
+                        team_trophy_count = 0
+                else:
+                    team_trophy_count = battle['team'][0]['startingTrophies']
+
+                battle_time = battle['battleTime']
+                team_cards = [card['name'] for card in battle['team'][0]['cards']]
+                opponent_cards = [card['name'] for card in battle['opponent'][0]['cards']]
+                game_mode = clean_game_mode("{} - {}".format(battle['type'], battle['gameMode']['name']))
+                arena = battle['arena']['name']
+
+                data['win_loss'].append(win_loss)
+                data['team_trophy_count'].append(team_trophy_count)
+                data['battle_time'].append(battle_time)
+                data['team_cards'].append(team_cards)
+                data['opponent_cards'].append(opponent_cards)
+                data['game_mode'].append(game_mode)
+                data['arena'].append(arena)
+        except:
+            continue
+    
+    after_data_length = len(data['win_loss'])
+    logging.info('Player {} went from {} battles to {} battles logged.'.format(player_tag, before_data_length, after_data_length))
     # save to storage
     local_fname = '/tmp/{}.p'.format(player_tag)
     with open(local_fname, 'wb') as f:
