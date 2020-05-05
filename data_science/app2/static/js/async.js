@@ -21,6 +21,8 @@ async function get_data(seedValue) {
     fill_filters(data)
     show_number_games(data)
     show_win_rate(data)
+    // NEW FILTERS
+    create_selectize_filters(data)
 }
 
 var url_dict = {'Giant': 'https://api-assets.clashroyale.com/cards/300/Axr4ox5_b7edmLsoHxBX3vmgijAIibuF6RImTbqLlXE.png',

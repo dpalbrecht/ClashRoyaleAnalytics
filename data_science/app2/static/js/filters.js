@@ -110,19 +110,23 @@ function fill_filters(data) {
 }
 
 
-// NEW filters
-$('#select-country-index').selectize({
-	sortField: 'text',
-	maxItems: 1,
-	onChange: function () {
-        // trigger filters on change with current values
-    }
-});
 
-// take this out of a function so it just gets triggered like the trophy filter
-function create_selectize_menu_index(destinations){
-    for (i = 0; i < destinations.length; i++) {
-        $("#select-country-index")[0].selectize.addOption({value:destinations[i],
-                                                           text:destinations[i]});
+// NEW filters
+function create_fill_selectize_filters(data, filter_id){
+    $(filter_id).selectize({
+        plugins: ['remove_button'],
+    	sortField: 'text',
+    	maxItems: 8,
+    	onChange: function () {
+            // trigger filters on change with current values
+        }
+    });
+    for (i = 0; i < data.length; i++) {
+        $(filter_id)[0].selectize.addOption({value:data[i],
+                                             text:data[i]});
     };
+};
+
+function create_selectize_filters(data){
+    create_fill_selectize_filters(data['your_team_cards'], '#your_team_filter2')
 };

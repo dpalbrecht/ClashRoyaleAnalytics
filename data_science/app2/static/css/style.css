@@ -34,13 +34,24 @@
 #overall_stats_div {
     font-family: clashFont;
     text-align: center;
-    margin: 5% auto 5%;
+    margin: 0% auto 5%;
     border-radius: 25px;
     border: 2px solid black;
     padding: 5%;
     background-color: rgba(0, 0, 0, 0.5);
     color: white;
     max-width: fit-content;
+}
+
+.filter_text {
+    font-family: clashFont;
+    color: white;
+    font-size: 12;
+    margin: auto;
+}
+
+.form-group {
+    margin: auto;
 }
 
 @font-face {
@@ -176,11 +187,42 @@ table, th, td
 
 
 /* NEW FILTERS */
+
+.selectize-input {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: rgba(0,0,0,.75);
+    border: 5px black;
+}
+
+ /* doesnt work, not sure why */
+/* .selectize-input has-options {
+    background-color: rgba(0,0,0,.75);
+    border: 5px black;
+} */
+
+.selectize-input div.item {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+a.remove {
+    display: flex !important;
+    justify-content: center !important;
+    align-items: center !important;
+}
+
+.selectize-input div.item {
+    max-height: 25px;
+}
+
 .search-bar {
   height: 100%;
 }
 
-.search-bar #select-country-selectized {
+.search-bar {
   height: 40px;
 }
 

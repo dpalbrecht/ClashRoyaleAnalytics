@@ -10,6 +10,8 @@
 
 	<!-- Latest compiled and minified CSS -->
 	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/css/bootstrap.min.css" integrity="sha384-PsH8R72JQ3SOdhVi3uxftmaW6Vc51MKb0q5P2rRUpPvrszuE4W1povHYgTpBfshb" crossorigin="anonymous">
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/ion-rangeslider/2.3.1/css/ion.rangeSlider.min.css"/>
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/selectize.js/0.12.6/css/selectize.bootstrap2.min.css">
 	<link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 	<link rel="stylesheet" href="{{ url_for('static', filename='css/c3.css') }}">
 
@@ -62,8 +64,7 @@
 
 		<div class="container" id="results_container">
 			<div class="row hl">
-
-				<div id="overall_stats_div">
+				<div class="col" id="overall_stats_div">
 					<div>
 						Overall Win Rate:<div id="win_rate_div"></div>
 					</div>
@@ -71,12 +72,18 @@
 						Number of Games Analyzed:<div id="num_games_div"></div>
 					</div>
 				</div>
+			</div>
+
+			<div class="row">
 
 				<!-- NEW FILTERS -->
 				<div class="row search-bar">
-		            <div class="col text-center search-div m-auto">
-		              <div class="form-group mx-sm-3 mb-2">
-		                <select id="select-country-index" class="demo-default" placeholder="Search..."></select>
+					<div class="col filter_text">
+						Your Deck Contains:
+					</div>
+		            <div class="col text-center">
+		              <div class="form-group">
+		                <select id="your_team_filter2" placeholder="No Filter"></select>
 		              </div>
 		            </div>
 		        </div>
@@ -169,20 +176,21 @@
 						Messages:
 						<div id="messages_div"></div>
 					</div>
+				</div>
+			</div>
 
-			<div id="stats_results">
+			<div class="row" id="stats_results">
 			</div>
 		</div>
 
 	</div>
 
-	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/ion-rangeslider/2.3.1/css/ion.rangeSlider.min.css"/>
 	<!-- Latest compiled and minified JavaScript -->
 	<script src="https://code.jquery.com/jquery-3.4.1.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/selectize.js/0.12.6/js/standalone/selectize.min.js"></script>
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/ion-rangeslider/2.3.1/js/ion.rangeSlider.min.js"></script>
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
 	<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
-	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/selectize.js/0.12.6/css/selectize.bootstrap2.min.css">
 	<script src="{{ url_for('static', filename='js/async.js') }}"></script>
 	<script src="{{ url_for('static', filename='js/filters.js') }}"></script>
 	<script src="{{ url_for('static', filename='js/c3.min.js') }}"></script>
