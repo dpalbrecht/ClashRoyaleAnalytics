@@ -61,7 +61,7 @@ def process_battles(request):
     
     # process battles and add to data
     # handle errors by skipping battles
-    for battle in battle_list:
+    for battle in battle_list[::-1]:
         # make sure you don't add the same battles twice
         # battles in 2v2, where it's harder to get data for both teams, are excluded
         battle_times = data['battle_time']
