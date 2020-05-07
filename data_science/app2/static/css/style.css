@@ -1,3 +1,7 @@
+.btn-primary:hover {
+    cursor: pointer;
+}
+
 /* BANNER */
 #banner_container {
     font-family: clashFont;
@@ -114,11 +118,6 @@ table, th, td
 #results_container {
     display:none;
 }
-
-#results_container {
-    display:none;
-}
-
 #results_table {
     margin: auto;
     text-align: center;
@@ -192,15 +191,14 @@ table, th, td
     display: flex;
     justify-content: center;
     align-items: center;
-    background-color: rgba(0,0,0,.75);
-    border: 5px black;
+    background-color: rgba(0,0,0,1);
+    border: 5px white;
 }
 
- /* doesnt work, not sure why */
-/* .selectize-input has-options {
-    background-color: rgba(0,0,0,.75);
-    border: 5px black;
-} */
+.selectize-input:hover {
+    background-color: rgba(0,0,25,.75);
+    cursor: pointer;
+}
 
 .selectize-input div.item {
     display: flex;
@@ -212,10 +210,14 @@ a.remove {
     display: flex !important;
     justify-content: center !important;
     align-items: center !important;
+    font-family: clashFont;
 }
 
 .selectize-input div.item {
     max-height: 25px;
+    font-family: clashFont;
+    color: black;
+    font-size: 10px;
 }
 
 .search-bar {
