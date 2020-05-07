@@ -93,18 +93,18 @@ function set_filter_values (values_list, dropdown_id, classes) {
 };
 
 function fill_filters(data) {
-    set_filter_values(data['your_team_cards'],
-        "your_team_cards_dropdown",
-        "dropdown-item attrib-button")
-    set_filter_values(data['opponent_team_cards'],
-        "opponent_team_cards_dropdown",
-        "dropdown-item attrib-button")
-    set_filter_values(data['game_modes'],
-        "game_mode_dropdown",
-        "dropdown-item attrib-button")
-    set_filter_values(data['arenas'],
-        "arena_dropdown",
-        "dropdown-item attrib-button")
+    // set_filter_values(data['your_team_cards'],
+    //     "your_team_cards_dropdown",
+    //     "dropdown-item attrib-button")
+    // set_filter_values(data['opponent_team_cards'],
+    //     "opponent_team_cards_dropdown",
+    //     "dropdown-item attrib-button")
+    // set_filter_values(data['game_modes'],
+    //     "game_mode_dropdown",
+    //     "dropdown-item attrib-button")
+    // set_filter_values(data['arenas'],
+    //     "arena_dropdown",
+    //     "dropdown-item attrib-button")
     set_trophy_slider(data['min_trophy'],
                       data['max_trophy'])
 }
@@ -112,21 +112,44 @@ function fill_filters(data) {
 
 
 // NEW filters
-function create_fill_selectize_filters(data, filter_id){
-    $(filter_id).selectize({
-        plugins: ['remove_button'],
-    	sortField: 'text',
-    	maxItems: 8,
-    	onChange: function () {
-            // trigger filters on change with current values
-        }
-    });
+// function create_fill_selectize_filters(data, filter_id){
+//     $(filter_id).selectize({
+//         plugins: ['remove_button'],
+//     	sortField: 'text',
+//     	maxItems: 8,
+//     	onChange: function () {
+//             // trigger filters on change with current values
+//         }
+//     });
+//     for (i = 0; i < data.length; i++) {
+//         $(filter_id)[0].selectize.addOption({value:data[i],
+//                                              text:data[i]});
+//     };
+// };
+//
+// function create_selectize_filters(data){
+//     create_fill_selectize_filters(data['your_team_cards'], '#your_team_filter2')
+// };
+
+function create_fill_filters(data, filter_id){
+    var data_values = []
     for (i = 0; i < data.length; i++) {
-        $(filter_id)[0].selectize.addOption({value:data[i],
-                                             text:data[i]});
+        data_values.push({'value':data[i]});
     };
+    tail.select(filter_id, {
+        multiple:true,
+        items:data_values,
+        search: true,
+        multiLimit:8,
+        multiContainer:true,
+        multiPinSelected:true,
+        multiShowCount:true,
+        multiShowLimit:true,
+        deselect:true,
+        searchMarked:false
+    });
 };
 
-function create_selectize_filters(data){
-    create_fill_selectize_filters(data['your_team_cards'], '#your_team_filter2')
+function create_filters(data){
+    create_fill_filters(data['your_team_cards'], '#your_team_filter2')
 };

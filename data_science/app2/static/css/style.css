@@ -187,7 +187,7 @@ table, th, td
 
 /* NEW FILTERS */
 
-.selectize-input {
+/* .selectize-input {
     display: flex;
     justify-content: center;
     align-items: center;
@@ -218,7 +218,7 @@ a.remove {
     font-family: clashFont;
     color: black;
     font-size: 10px;
-}
+} */
 
 .search-bar {
   height: 100%;
