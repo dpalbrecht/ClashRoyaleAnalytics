@@ -77,10 +77,10 @@
     margin-bottom: 10%;
 }
 
-table, th, td
+/* table, th, td
 {
   border: 5px solid white;
-}
+} */
 
 #top_form {
     text-align: center;
@@ -243,4 +243,14 @@ a.remove {
   .search-bar .selectize-input {
     width: 240px !important
   }
+}
+
+.filters_table {
+    border: none !important;
+}
+
+.filter_label {
+    padding-right: 20px;
+    font-family: clashFont;
+    color: white;
 }

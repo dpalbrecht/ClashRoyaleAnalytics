@@ -146,8 +146,7 @@ function create_fill_filters(data, filter_id){
         multiShowCount:true,
         multiShowLimit:true,
         deselect:true,
-        searchMarked:false,
-        width:'25vw'
+        searchMarked:false
     });
 };
 

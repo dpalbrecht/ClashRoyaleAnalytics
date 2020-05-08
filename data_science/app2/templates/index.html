@@ -75,29 +75,27 @@
 				</div>
 			</div>
 
-			<!-- FOR SOME REASON, ADDING THIS MESSES WITH THE RESULTS_DIV MARGINS -->
-			<!-- https://github.com/pytesNET/tail.select/wiki/Public-Options -->
 			<!-- https://www.youtube.com/watch?v=ZofAbz3hFt0 -->
+			<!-- but this does not re-size well... take away table -->
 			<div class="row">
-				<div class="col">
-					<select id="your_team_filter2" placeholder="No Filter">
-				</div>
+				<table class="filters_table">
+					<tr>
+						<td class="filter_label">Your Deck Contains:</td>
+						<td><select id="your_team_filter2" placeholder="No Filter"></select></td>
+					</tr>
+				</table>
 			</div>
 
+			<!-- <div class="row filter_row">
+				<div class="col">
+					Your Deck Contains:
+				</div>
+				<div class="col">
+					<select id="your_team_filter2" placeholder="No Filter"></select>
+				</div>
+			</div> -->
+
 			<div class="row">
-
-				<!-- NEW FILTERS -->
-				<!-- <div class="row search-bar">
-					<div class="col filter_text">
-						Your Deck Contains:
-					</div>
-		            <div class="col text-center">
-		              <div class="form-group">
-		                <select id="your_team_filter2" placeholder="No Filter"></select>
-		              </div>
-		            </div>
-		        </div> -->
-
 				<div class="col-sm-12">
 					<div id="button-group-label-attribs"><h4>Filter your results:</h4></div>
 					<div class="dropdown" id="your_team_filter">
