@@ -134,7 +134,7 @@ function fill_filters(data) {
 function create_fill_filters(data, filter_id){
     var data_values = []
     for (i = 0; i < data.length; i++) {
-        data_values.push({'value':data[i]});
+        data_values.push({'value':data[i], 'text':data[i]});
     };
     tail.select(filter_id, {
         multiple:true,
@@ -146,10 +146,22 @@ function create_fill_filters(data, filter_id){
         multiShowCount:true,
         multiShowLimit:true,
         deselect:true,
-        searchMarked:false
+        searchMarked:false,
+        width:'25vw'
     });
 };
 
 function create_filters(data){
     create_fill_filters(data['your_team_cards'], '#your_team_filter2')
 };
+
+$("#your_team_filter2").on("change", function () {
+    var selected_vals = []
+    var children = $("#your_team_filter2").children()
+    for (i=0; i<children.length; i++) {
+        if (typeof children[i].attributes[2] !== 'undefined') {
+            selected_vals.push(children[i].text);
+        };
+    };
+    console.log(selected_vals);
+});
