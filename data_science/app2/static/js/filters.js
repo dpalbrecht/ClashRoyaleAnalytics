@@ -112,26 +112,7 @@ function fill_filters(data) {
 
 
 // NEW filters
-// function create_fill_selectize_filters(data, filter_id){
-//     $(filter_id).selectize({
-//         plugins: ['remove_button'],
-//     	sortField: 'text',
-//     	maxItems: 8,
-//     	onChange: function () {
-//             // trigger filters on change with current values
-//         }
-//     });
-//     for (i = 0; i < data.length; i++) {
-//         $(filter_id)[0].selectize.addOption({value:data[i],
-//                                              text:data[i]});
-//     };
-// };
-//
-// function create_selectize_filters(data){
-//     create_fill_selectize_filters(data['your_team_cards'], '#your_team_filter2')
-// };
-
-function create_fill_filters(data, filter_id){
+function create_fill_filters(data, filter_id, limit, show_limit){
     var data_values = []
     for (i = 0; i < data.length; i++) {
         data_values.push({'value':data[i], 'text':data[i]});
@@ -140,10 +121,10 @@ function create_fill_filters(data, filter_id){
         multiple:true,
         items:data_values,
         search: true,
-        multiLimit:8,
+        multiLimit:limit,
         multiContainer:true,
         multiPinSelected:true,
-        multiShowCount:true,
+        multiShowCount:show_limit,
         multiShowLimit:true,
         deselect:true,
         searchMarked:false
@@ -151,16 +132,61 @@ function create_fill_filters(data, filter_id){
 };
 
 function create_filters(data){
-    create_fill_filters(data['your_team_cards'], '#your_team_filter2')
+    create_fill_filters(data['your_team_cards'], '#your_team_filter', 8, true)
+    create_fill_filters(data['opponent_team_cards'], '#opponent_team_filter', 8, true)
+    create_fill_filters(data['game_modes'], '#game_mode_filter', Infinity, false)
+    create_fill_filters(data['arenas'], '#arena_filter', Infinity, false)
+    create_fill_filters(['Last Day', 'Last Week', 'Last Month'], '#battle_time_filter', 1, true)
 };
 
-$("#your_team_filter2").on("change", function () {
+function get_filter_vals(filter_id) {
     var selected_vals = []
-    var children = $("#your_team_filter2").children()
+    var children = $(filter_id).children()
     for (i=0; i<children.length; i++) {
         if (typeof children[i].attributes[2] !== 'undefined') {
             selected_vals.push(children[i].text);
         };
     };
     console.log(selected_vals);
+
+    // var filter_names = [
+    //     'your_team_filter',
+    //     'opponent_team_filter',
+    //     'game_mode_filter',
+    //     'arena_filter',
+    //     'trophy_filter',
+    //     'battle_time_filter'
+    // ]
+    // var result = {}
+    // for (i=0; i<filter_names.length; i++) {
+    //     var selected_vals = []
+    //     var children = $('#'+filter_names[i]).children()
+    //     for (j=0; j<children.length; j++) {
+    //         if (typeof children[j].attributes[2] !== 'undefined') {
+    //             selected_vals.push(children[j].text);
+    //         };
+    //     };
+    //     result[filter_names[i]] = selected_vals;
+    // }
+    // console.log(result);
+};
+
+$("#your_team_filter").on("change", function () {
+    get_filter_vals("#your_team_filter")
+});
+
+$("#opponent_team_filter").on("change", function () {
+    get_filter_vals("#opponent_team_filter")
+});
+
+$("#game_mode_filter").on("change", function () {
+    get_filter_vals("#game_mode_filter")
+});
+
+$("#arena_filter").on("change", function () {
+    get_filter_vals("#arena_filter")
+});
+
+$("#battle_time_filter").on("change", function () {
+    get_filter_vals("#battle_time_filter")
 });

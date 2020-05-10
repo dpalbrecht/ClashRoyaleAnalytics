@@ -75,30 +75,45 @@
 				</div>
 			</div>
 
-			<!-- https://www.youtube.com/watch?v=ZofAbz3hFt0 -->
-			<!-- but this does not re-size well... take away table -->
 			<div class="row">
 				<table class="filters_table">
 					<tr>
-						<td class="filter_label">Your Deck Contains:</td>
-						<td><select id="your_team_filter2" placeholder="No Filter"></select></td>
+						<td class="filter_label">Your Deck Has:</td>
+						<td><select id="your_team_filter" placeholder="No Filter"></select></td>
 					</tr>
+					<tr class="filters_spacer"></tr>
+					<tr>
+						<td class="filter_label">Opponent's Deck Has:</td>
+						<td><select id="opponent_team_filter" placeholder="No Filter"></select></td>
+					</tr>
+					<tr class="filters_spacer"></tr>
+					<tr>
+						<td class="filter_label">Game Mode:</td>
+						<td><select id="game_mode_filter" placeholder="No Filter"></select></td>
+					</tr>
+					<tr class="filters_spacer"></tr>
+					<tr>
+						<td class="filter_label">Arena:</td>
+						<td><select id="arena_filter" placeholder="No Filter"></select></td>
+					</tr>
+					<tr class="filters_spacer"></tr>
+					<tr>
+						<td class="filter_label">Battle Time:</td>
+						<td><select id="battle_time_filter" placeholder="No Filter"></select></td>
+					</tr>
+					<tr class="filters_spacer"></tr>
+					<tr>
+						<td class="filter_label">Trophy Range:</td>
+						<td id="trophy_range_td"><input type="text" id="trophy_slider" value="" /></td>
+					</tr>
+					<tr class="filters_spacer"></tr>
 				</table>
 			</div>
 
-			<!-- <div class="row filter_row">
-				<div class="col">
-					Your Deck Contains:
-				</div>
-				<div class="col">
-					<select id="your_team_filter2" placeholder="No Filter"></select>
-				</div>
-			</div> -->
-
 			<div class="row">
 				<div class="col-sm-12">
-					<div id="button-group-label-attribs"><h4>Filter your results:</h4></div>
-					<div class="dropdown" id="your_team_filter">
+					<!-- <div id="button-group-label-attribs"><h4>Filter your results:</h4></div> -->
+					<!-- <div class="dropdown" id="your_team_filter">
 						<button
 							class="btn btn-secondary dropdown-toggle filter_btn"
 							type="button" id="dropdownMenuButton"
@@ -112,8 +127,8 @@
 							aria-labelledby="dropdownMenuButton"
 						>
 						</ul>
-					</div>
-					<div class="dropdown" id="opponent_team_filter">
+					</div> -->
+					<!-- <div class="dropdown" id="opponent_team_filter">
 						<button
 							class="btn btn-secondary dropdown-toggle filter_btn"
 							type="button" id="dropdownMenuButton"
@@ -127,8 +142,8 @@
 							aria-labelledby="dropdownMenuButton"
 						>
 						</ul>
-					</div>
-					<div class="dropdown" id="game_mode_filter">
+					</div> -->
+					<!-- <div class="dropdown" id="game_mode_filter">
 						<button
 							class="btn btn-secondary dropdown-toggle filter_btn"
 							type="button" id="dropdownMenuButton"
@@ -142,8 +157,8 @@
 							aria-labelledby="dropdownMenuButton"
 						>
 						</ul>
-					</div>
-					<div class="dropdown" id="arena_filter">
+					</div> -->
+					<!-- <div class="dropdown" id="arena_filter">
 						<button
 							class="btn btn-secondary dropdown-toggle filter_btn"
 							type="button" id="dropdownMenuButton"
@@ -157,8 +172,8 @@
 							aria-labelledby="dropdownMenuButton"
 						>
 						</ul>
-					</div>
-					<div class="dropdown" id="battle_time_filter">
+					</div> -->
+					<!-- <div class="dropdown" id="battle_time_filter">
 						<button
 							class="btn btn-secondary dropdown-toggle filter_btn"
 							type="button" id="dropdownMenuButton"
@@ -175,11 +190,11 @@
 							<li class="dropdown-item attrib-button-single">Last Week</li>
 							<li class="dropdown-item attrib-button-single">Last Month</li>
 						</ul>
-					</div>
-					<div id="trophy_range_div">
+					</div> -->
+					<!-- <div id="trophy_range_div">
 						<div>Trophy Range:</div>
 						<input type="text" id="trophy_slider" value="" />
-					</div>
+					</div> -->
 					<div>
 						Messages:
 						<div id="messages_div"></div>

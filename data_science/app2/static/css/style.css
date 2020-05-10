@@ -179,9 +179,8 @@
   background: #4CAF50;
   cursor: pointer;
 }
-#trophy_range_div {
-    width: 30%;
-    margin-bottom: 10px;
+#trophy_range_td {
+    width: 280px;
 }
 
 
@@ -247,10 +246,32 @@ a.remove {
 
 .filters_table {
     border: none !important;
+    display: block;
+}
+.filters_table td {
+    display: inline-block;
 }
 
 .filter_label {
-    padding-right: 20px;
+    width: 350px;
     font-family: clashFont;
     color: white;
+}
+
+.tail-select-container .select-handle {
+    font-family: clashFont;
+    background: rgba(0,0,0,.7);
+    font-size: 16px;
+}
+
+.tail-select-container {
+    min-height: 40px;
+}
+
+.filters_spacer {
+    height: 10px;
+}
+
+.tail-select .select-dropdown ul li.dropdown-option {
+    font-family: clashFont;
 }
