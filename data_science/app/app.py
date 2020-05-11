@@ -79,22 +79,47 @@ def process_battles(player_tag, battle_list):
         data = pickle.loads(blob.download_as_string())
 
     # process battles and add to data
-    for battle in battle_list:
+    # handle errors by skipping battles
+    for battle in battle_list[::-1]:
         # make sure you don't add the same battles twice
         # battles in 2v2, where it's harder to get data for both teams, are excluded
-        if (battle['battleTime'] not in data['battle_time']) and ('2v2' not in battle['type']):
-            if battle['team'][0]['crowns'] > battle['opponent'][0]['crowns']:
-                data['win_loss'].append('win')
-            elif battle['team'][0]['crowns'] < battle['opponent'][0]['crowns']:
-                data['win_loss'].append('loss')
-            else:
-                continue
-            data['battle_time'].append(battle['battleTime'])
-            data['team_cards'].append([card['name'] for card in battle['team'][0]['cards']])
-            data['opponent_cards'].append([card['name'] for card in battle['opponent'][0]['cards']])
-            data['team_trophy_count'].append(battle['team'][0]['startingTrophies'])
-            data['game_mode'].append(clean_game_mode("{} - {}".format(battle['type'], battle['gameMode']['name'])))
-            data['arena'].append(battle['arena']['name'])
+        battle_times = data['battle_time']
+        try:
+            if (battle['battleTime'] not in battle_times) and ('2v2' not in battle['type']):
+                if battle['team'][0]['crowns'] > battle['opponent'][0]['crowns']:
+                    win_loss = 'win'
+                elif battle['team'][0]['crowns'] < battle['opponent'][0]['crowns']:
+                    win_loss = 'loss'
+                else:
+                    assert 1 == 2
+
+                # if the battle is a tournament, take the last available trophy count
+                if battle['type'] == 'tournament':
+                    if len(data['team_trophy_count']) > 0:
+                        team_trophy_count = data['team_trophy_count'][-1]
+                    else:
+                        team_trophy_count = battle['team'][0]['startingTrophies']
+                    if team_trophy_count is None:
+                        team_trophy_count = 0
+                else:
+                    team_trophy_count = battle['team'][0]['startingTrophies']
+
+                battle_time = battle['battleTime']
+                team_cards = [card['name'] for card in battle['team'][0]['cards']]
+                opponent_cards = [card['name'] for card in battle['opponent'][0]['cards']]
+                game_mode = clean_game_mode("{} - {}".format(battle['type'], battle['gameMode']['name']))
+                arena = battle['arena']['name']
+
+                data['win_loss'].append(win_loss)
+                data['team_trophy_count'].append(team_trophy_count)
+                data['battle_time'].append(battle_time)
+                data['team_cards'].append(team_cards)
+                data['opponent_cards'].append(opponent_cards)
+                data['game_mode'].append(game_mode)
+                data['arena'].append(arena)
+        except:
+            continue
+
     # save to storage
     local_fname = '{}.p'.format(player_tag)
     with open(local_fname, 'wb') as f:
@@ -144,7 +169,7 @@ def process_data(data, filter_dict):
         start = end - datetime.timedelta(days=num_days)
         time_inds = np.where((battle_times>=start) & (battle_times<=end))[0]
     if len(time_inds) == 0:
-        messages.append('You have not played games within the {}.'.format(filter_dict['battle_time_range'].lower()))
+        messages.append('You have not played games within this time frame.')
 
     # Find battles that match game modes
     if filter_dict['game_modes'] == []:
@@ -205,6 +230,17 @@ def process_data(data, filter_dict):
         all_opponent_cards_dict = {}
         total_win_rate = 0
         messages.append('This combination of filters does not produce results.')
+
+    if data == {
+        'battle_time':[],
+        'team_cards':[],
+        'opponent_cards':[],
+        'team_trophy_count':[],
+        'game_mode':[],
+        'arena':[],
+        'win_loss':[]
+    }:
+        messages = ['You don\'t have any 1v1 battles to analyze right now. Play some battles and try again!']
 
     return win_card_stats, all_opponent_cards_dict, messages, len(shared_inds), total_win_rate
 
@@ -279,27 +315,23 @@ def process_front_page():
                        num_battles=num_battles,
                        total_win_rate=total_win_rate)
 
-
-def clean_filters(raw_filter_values):
-    return [i for i in raw_filter_values.split(': ')[1].split(', ') if i !='No Filter']
-
 def clean_trophy_filter(raw_filter_values):
     split_vals = raw_filter_values.split(';')
     return int(split_vals[0]), int(split_vals[1])
 
-def clean_battle_time_filter(raw_filter_values):
-    filter_values = raw_filter_values.split(': ')[1]
-    if filter_values == 'No Filter':
-        filter_values = []
-    return filter_values
+def clean_battle_time_filter(raw_filter_list):
+    if len(raw_filter_list) == 0:
+        return raw_filter_list
+    else:
+        return raw_filter_list[0]
 
 @app.route('/filter', methods=['POST'])
 def process_filter():
     content = request.get_json()
-    your_team_filter_values = clean_filters(content.get('your_team_filter'))
-    opponent_team_filter_values = clean_filters(content.get('opponent_team_filter'))
-    game_mode_filter_values = clean_filters(content.get('game_mode_filter'))
-    arena_filter_values = clean_filters(content.get('arena_filter'))
+    your_team_filter_values = content.get('your_team_filter')
+    opponent_team_filter_values = content.get('opponent_team_filter')
+    game_mode_filter_values = content.get('game_mode_filter')
+    arena_filter_values = [] #content.get('arena_filter')
     battle_time_filter_values = clean_battle_time_filter(content.get('battle_time_filter'))
     min_trophy, max_trophy = clean_trophy_filter(content.get('trophy_filter'))
 

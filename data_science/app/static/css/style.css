@@ -1,32 +1,113 @@
-#result_div
-{
+.btn-primary:hover {
+    cursor: pointer;
+}
+
+/* BANNER */
+#banner_container {
+    font-family: clashFont;
+    text-align: center;
+    border-radius: 25px;
+    border: 2px solid black;
+    padding: 5%;
+    background-color: rgba(0, 0, 0, 0.5);
+    color: white;
+    margin-bottom: 5%;
+    margin-top: 5%;
+}
+
+#main_container {
+    font-family: clashFont;
+    text-align: center;
+    margin-bottom: 5%;
+    border-radius: 25px;
+    border: 2px solid black;
+    padding: 5%;
+    background-color: rgba(0, 0, 0, 0.5);
+    color: white;
+}
+
+#background_container {
+    background-image: url('../clash_bg.png');
+	background-position:center;
+	background-repeat:no-repeat;
+	background-size:cover;
+    height: 100vh;
+    overflow: auto;
+}
+
+#overall_stats_div {
+    font-family: clashFont;
+    text-align: center;
+    margin: 0% auto 5%;
+    border-radius: 25px;
+    border: 2px solid black;
+    padding: 5%;
+    background-color: rgba(0, 0, 0, 0.5);
+    color: white;
+    max-width: fit-content;
+}
+
+.filter_text {
+    font-family: clashFont;
+    color: white;
+    font-size: 12;
+    margin: auto;
+}
+
+.form-group {
+    margin: auto;
+}
+
+@font-face {
+  font-family: 'clashFont';
+  src: url('../You Blockhead.ttf');
+}
+
+.smaller_font {
+    font-size: 12px
+}
+
+#result_div {
     margin: 10px 50% 10px 0;
 }
 
-#results_image
-{
-    width:100px;
-    height:100px;
+#results_image {
+    height: 100px;
+    margin-top: 10%;
+    margin-bottom: 10%;
 }
 
-table, th, td
+/* table, th, td
 {
-  border: 1px solid black;
+  border: 5px solid white;
+} */
+
+#top_form {
+    text-align: center;
+    justify-content: center;
+    margin: 5% 5% 0% 5%;
 }
 
-#top_form
-{
-    margin: 10px 3px 30px 0px;
+#seedInput {
+    margin: 0px 10px 0px 0px;
 }
 
-#seedInput
-{
-    margin: 0px 3px 0px 0px;
+#analyze_button {
+    margin-top: 10px;
 }
 
 .result_box
 {
     padding: 15px;
+    border-radius: 25px;
+    border: 2px solid white !important;
+    max-width: 120px;
+    font-family: clashFont;
+    text-align: center;
+    color: white;
+    font-size: .55em;
+    float: none;
+    margin: 1% auto;
 }
 
 #num_games_div {
@@ -35,6 +116,22 @@ table, th, td
 
 #win_rate_div {
     display: inline;
+}
+
+#results_container {
+    display:none;
+}
+#results_table {
+    margin: auto;
+    text-align: center;
+    font-family: clashFont;
+    font-size: 12px;
+    color: white;
+}
+
+#results_div {
+    display: flex !important;
+    flex-wrap: wrap !important;
 }
 
 /* FILTERS  */
@@ -85,7 +182,141 @@ table, th, td
   background: #4CAF50;
   cursor: pointer;
 }
-#trophy_range_div {
-    width: 30%;
-    margin-bottom: 10px;
+#trophy_range_td {
+    width: 280px;
+}
+
+
+/* NEW FILTERS */
+
+/* .selectize-input {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: rgba(0,0,0,1);
+    border: 5px white;
+}
+
+.selectize-input:hover {
+    background-color: rgba(0,0,25,.75);
+    cursor: pointer;
+}
+
+.selectize-input div.item {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+a.remove {
+    display: flex !important;
+    justify-content: center !important;
+    align-items: center !important;
+    font-family: clashFont;
+}
+
+.selectize-input div.item {
+    max-height: 25px;
+    font-family: clashFont;
+    color: black;
+    font-size: 10px;
+} */
+
+.search-bar {
+  height: 100%;
+}
+
+.search-bar {
+  height: 40px;
+}
+
+.search-bar .selectize-input .item {
+  height: 40px;
+  line-height: 2.4;
+  font-size: 18px;
+}
+
+@media (max-width: 767px) {
+  .search-bar .selectize-input {
+    width: 450px !important
+  }
+}
+
+  .search-bar .selectize-input {
+    width: 240px !important
+  }
+}
+
+.filters_table {
+    border: none !important;
+    display: block;
+}
+.filters_table td {
+    display: inline-block;
+}
+
+.filter_label {
+    width: 350px;
+    font-family: clashFont;
+    color: white;
+}
+
+.tail-select-container .select-handle {
+    font-family: clashFont;
+    background: rgba(0,0,0,.7);
+    font-size: 16px;
+}
+
+.tail-select-container {
+    min-height: 40px;
+}
+
+.filters_spacer {
+    height: 10px;
+}
+
+.tail-select .select-dropdown ul li.dropdown-option {
+    font-family: clashFont;
+    list-style-position: inside;
+    border: solid black;
+    border-width: .5px 1px .5px 1px;
+}
+
+.irs {
+    font-family: clashFont;
+}
+
+#footer_policy {
+    margin-top: 50px;
+    border-top: 2px solid black;
+    height: 150px;
+    display: flex;
+    background: rgba(0,0,0,.6);
+}
+
+#footer_text {
+    font-family: clashFont;
+    color: white;
+    margin: auto;
+    max-width: 90%;
+    font-size: 12px;
+}
+
+#results_loading_div {
+    display: none;
+    font-family: clashFont;
+    text-align: center;
+    margin-bottom: 5%;
+    border-radius: 25px;
+    border: 2px solid black;
+    padding: 5%;
+    background-color: rgba(0, 0, 0, 0.5);
+    color: white;
+}
+
+#results_loading_spinner {
+    margin-top: 10%;
+    width: 10rem;
+    height: 10rem;
+    animation: spinner-grow 1s linear infinite;
 }

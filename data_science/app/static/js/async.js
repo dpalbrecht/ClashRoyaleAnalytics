@@ -4,22 +4,39 @@ $(document).on('submit', '#form', (event) => {
     get_data(seedValue)
 })
 
-async function get_data(seedValue) {
-    const response = await fetch('/process', {
-        method: 'POST',
-        body: JSON.stringify({
-            player_tag: seedValue,
-        }),
-        headers: {
-            'Content-Type': 'application/json',
-        },
-    })
-    const data = await response.json()
-    render(data)
-    fill_filters(data)
-    show_number_games(data)
-    show_win_rate(data)
-}
+function get_data(seedValue) {
+    document.getElementById("results_loading_div").style.display = "flex";
+    $.ajax({
+	        type: 'POST',
+	        url: '/process',
+	        dataType: 'json',
+	        contentType: 'application/json; charset=utf-8',
+	        data: JSON.stringify({player_tag: seedValue}),
+	        success:
+	        function(data) {
+                window.scrollTo(0, 0);
+				document.getElementById("results_loading_div").style.display = "none";
+                if (typeof data['player_error_flag'] !== 'undefined') {
+                    alert(`Oh no! This player tag has an error :(
+            Player tags should only contain these characters:
+            Numbers: 0, 2, 8, 9
+            Letters: P, Y, L, Q, G, R, J, C, U, V`);
+                } else {
+                    document.getElementById("main_container").style.display = "none";
+                    document.getElementById("results_container").style.display = "inherit";
+                    document.getElementById("page_header").innerHTML = "Check out your results!"
+                    document.getElementById("page_subheader").innerHTML = "Use the filters and see how well you've been playing."
+                    render(data)
+                    show_number_games(data)
+                    show_win_rate(data)
+                    create_filters(data)
+                    if (data['messages'].length > 0) {
+                        setTimeout(function() {show_messages(data)},10)
+                    };
+                };
+	        }
+	    });
+};
 
 var url_dict = {'Giant': 'https://api-assets.clashroyale.com/cards/300/Axr4ox5_b7edmLsoHxBX3vmgijAIibuF6RImTbqLlXE.png',
  'Skeletons': 'https://api-assets.clashroyale.com/cards/300/oO7iKMU5m0cdxhYPZA3nWQiAUh2yoGgdThLWB1rVSec.png',
@@ -121,43 +138,32 @@ var url_dict = {'Giant': 'https://api-assets.clashroyale.com/cards/300/Axr4ox5_b
  'Goblin Hut': 'https://api-assets.clashroyale.com/cards/300/l8ZdzzNLcwB4u7ihGgxNFQOjCT_njFuAhZr7D6PRF7E.png'}
 
 function render(data) {
-    if (typeof data['player_error_flag'] !== 'undefined') {
-        // Show error if player tag didn't exist
-        document.getElementById("main_container").innerHTML = "The player tag you entered is not correct :( please try again!"
-    } else {
-        // Show results
-        var cards = data['cards']
-        var play_counts = data['play_counts']
-        var win_percents = data['win_percents']
-        var messages = data['messages']
+    // Show results
+    var cards = data['cards']
+    var play_counts = data['play_counts']
+    var win_percents = data['win_percents']
 
-        var result = "<table>"
-        var n = 5;
-        for (i = 0; i < cards.length; i+=n) {
-            result += "<tr>"
-            for (j = i; j < i+n; j++) {
-                if ((typeof cards[j] !== 'undefined') && (typeof url_dict[cards[j]] !== 'undefined')) {
-                    result += "<td class=\"result_box\"><div>"+cards[j]+"</div>"
-                    result += "<div><img id=\"results_image\" src="+url_dict[cards[j]]+"></div>"
-                    result += "<div>Play Count: "+play_counts[j]+"</div>"
-                    result += "<div>Win Rate: "+win_percents[j]+"%</div></td>"
-                }
-            }
-            result += "</tr>"
-        }
-        document.getElementById("stats_results").innerHTML = ""
-        document.getElementById("stats_results").innerHTML += result
-    };
+    var result = "<div id=\"row results_table\"><div id=\"results_div\">"
+    for (i = 0; i < cards.length; i+=1) {
+            result += "<div class=\"col result_box\"><div>"+cards[i]+"</div>"
+            result += "<div><img id=\"results_image\" src="+url_dict[cards[i]]+"></div>"
+            result += "<div>Play Count: "+play_counts[i]+"</div>"
+            result += "<div>Win Rate: "+win_percents[i]+"%</div></div>"
+    }
+    result += "</div></div>"
+
+    document.getElementById("stats_results").innerHTML = ""
+    document.getElementById("stats_results").innerHTML += result
 };
 
 function show_messages(data) {
     var messages = data['messages']
-    result = ""
+    result = "Oh no! Problem with these filter values:\r\n"
     for (i = 0; i < messages.length; i++) {
-        result += messages[i]+"<br>"
+        result += "\u2022 "+messages[i]+"\r\n"
     }
-    document.getElementById("messages_div").innerHTML = ""
-    document.getElementById("messages_div").innerHTML = result
+    console.log(result)
+    alert(result);
 };
 
 function show_number_games(data) {
