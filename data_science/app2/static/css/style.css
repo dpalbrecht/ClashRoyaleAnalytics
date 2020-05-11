@@ -88,9 +88,12 @@
     margin: 5% 5% 0% 5%;
 }
 
-#seedInput
-{
-    margin: 0px 3px 0px 0px;
+#seedInput {
+    margin: 0px 10px 0px 0px;
+}
+
+#analyze_button {
+    margin-top: 10px;
 }
 
 .result_box
@@ -274,4 +277,46 @@ a.remove {
 
 .tail-select .select-dropdown ul li.dropdown-option {
     font-family: clashFont;
+    list-style-position: inside;
+    border: solid black;
+    border-width: .5px 1px .5px 1px;
+}
+
+.irs {
+    font-family: clashFont;
+}
+
+#footer_policy {
+    margin-top: 50px;
+    border-top: 2px solid black;
+    height: 150px;
+    display: flex;
+    background: rgba(0,0,0,.6);
+}
+
+#footer_text {
+    font-family: clashFont;
+    color: white;
+    margin: auto;
+    max-width: 90%;
+    font-size: 12px;
+}
+
+#results_loading_div {
+    display: none;
+    font-family: clashFont;
+    text-align: center;
+    margin-bottom: 5%;
+    border-radius: 25px;
+    border: 2px solid black;
+    padding: 5%;
+    background-color: rgba(0, 0, 0, 0.5);
+    color: white;
+}
+
+#results_loading_spinner {
+    margin-top: 10%;
+    width: 10rem;
+    height: 10rem;
+    animation: spinner-grow 1s linear infinite;
 }
