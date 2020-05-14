@@ -48,7 +48,6 @@ def process_battles(request):
             'opponent_cards':[],
             'team_trophy_count':[],
             'game_mode':[],
-            'arena':[],
             'win_loss':[]
         }
     else:
@@ -57,7 +56,7 @@ def process_battles(request):
     response = requests.get('https://api.clashroyale.com/v1/players/%23{}/battlelog'.format(player_tag),
                             headers={"Authorization": "Bearer {}".format(TOKEN)})
     before_data_length = len(data['win_loss'])
-    battle_list = eval(response.text.replace('false', 'False').replace('true', 'True'))
+    battle_list = eval(response.text.replace('false', 'False').replace('true', 'True').replace('null','None'))
     
     # process battles and add to data
     # handle errors by skipping battles
@@ -90,7 +89,6 @@ def process_battles(request):
                 team_cards = [card['name'] for card in battle['team'][0]['cards']]
                 opponent_cards = [card['name'] for card in battle['opponent'][0]['cards']]
                 game_mode = clean_game_mode("{} - {}".format(battle['type'], battle['gameMode']['name']))
-                arena = battle['arena']['name']
 
                 data['win_loss'].append(win_loss)
                 data['team_trophy_count'].append(team_trophy_count)
@@ -98,7 +96,6 @@ def process_battles(request):
                 data['team_cards'].append(team_cards)
                 data['opponent_cards'].append(opponent_cards)
                 data['game_mode'].append(game_mode)
-                data['arena'].append(arena)
         except:
             continue
     
