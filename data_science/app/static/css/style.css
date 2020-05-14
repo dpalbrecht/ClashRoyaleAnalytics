@@ -132,6 +132,7 @@
 #results_div {
     display: flex !important;
     flex-wrap: wrap !important;
+    margin-top: 5%;
 }
 
 /* FILTERS  */

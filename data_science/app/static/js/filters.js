@@ -56,7 +56,6 @@ function create_filters(data){
     create_fill_filters(data['your_team_cards'], '#your_team_filter', 8, true)
     create_fill_filters(data['opponent_team_cards'], '#opponent_team_filter', 8, true)
     create_fill_filters(data['game_modes'], '#game_mode_filter', Infinity, false)
-    // create_fill_filters(data['arenas'], '#arena_filter', Infinity, false)
     create_fill_filters(['Last Day', 'Last Week', 'Last Month'], '#battle_time_filter', 1, true)
 };
 
@@ -65,7 +64,6 @@ function get_filter_vals() {
         'your_team_filter',
         'opponent_team_filter',
         'game_mode_filter',
-        // 'arena_filter',
         'battle_time_filter'
     ]
     var result = {}
@@ -94,10 +92,6 @@ $("#opponent_team_filter").on("change", function () {
 $("#game_mode_filter").on("change", function () {
     get_filter_vals()
 });
-
-// $("#arena_filter").on("change", function () {
-//     get_filter_vals()
-// });
 
 $("#battle_time_filter").on("change", function () {
     get_filter_vals()

@@ -41,7 +41,7 @@ def get_battles(player_tag):
     # Get battle logs
     battles_response = requests.get('https://api.clashroyale.com/v1/players/%23{}/battlelog'.format(player_tag),
         headers=HEADER)
-    battles_response = eval(battles_response.text.replace('false', 'False').replace('true', 'True'))
+    battles_response = eval(battles_response.text.replace('false', 'False').replace('true', 'True').replace('null','None'))
 
     return player_error_flag, profile_response, battles_response
 
@@ -72,7 +72,6 @@ def process_battles(player_tag, battle_list):
             'opponent_cards':[],
             'team_trophy_count':[],
             'game_mode':[],
-            'arena':[],
             'win_loss':[]
         }
     else:
@@ -108,7 +107,6 @@ def process_battles(player_tag, battle_list):
                 team_cards = [card['name'] for card in battle['team'][0]['cards']]
                 opponent_cards = [card['name'] for card in battle['opponent'][0]['cards']]
                 game_mode = clean_game_mode("{} - {}".format(battle['type'], battle['gameMode']['name']))
-                arena = battle['arena']['name']
 
                 data['win_loss'].append(win_loss)
                 data['team_trophy_count'].append(team_trophy_count)
@@ -116,7 +114,6 @@ def process_battles(player_tag, battle_list):
                 data['team_cards'].append(team_cards)
                 data['opponent_cards'].append(opponent_cards)
                 data['game_mode'].append(game_mode)
-                data['arena'].append(arena)
         except:
             continue
 
@@ -133,13 +130,11 @@ def process_battles(player_tag, battle_list):
     opponent_team_cards = sorted(set(itertools.chain(*data['opponent_cards'])))
     # Get all available game modes
     game_modes = sorted(set(data['game_mode']))
-    # Get all available arenas
-    arenas = sorted(set(data['arena']))
     # Get min and max trophies
     trophy_dict = {'min':str(min(data['team_trophy_count'])),
                    'max':str(max(data['team_trophy_count']))}
 
-    return data, your_team_cards, opponent_team_cards, game_modes, arenas, trophy_dict
+    return data, your_team_cards, opponent_team_cards, game_modes, trophy_dict
 
 def process_data(data, filter_dict):
     win_card_stats = {}
@@ -149,7 +144,6 @@ def process_data(data, filter_dict):
     opponent_cards = np.array(data['opponent_cards'])
     team_trophy_count = np.array(data['team_trophy_count'])
     game_mode = pd.Series(np.array(data['game_mode']))
-    arena = pd.Series(np.array(data['arena']))
     win_loss = np.array(data['win_loss'])
 
     # Find battles that were won
@@ -177,12 +171,6 @@ def process_data(data, filter_dict):
     else:
         game_mode_inds = np.array(game_mode[game_mode.isin(filter_dict['game_modes'])].index)
 
-    # Find battles that match arena
-    if filter_dict['arena'] == []:
-        arena_inds = np.array(range(len(arena)))
-    else:
-        arena_inds = np.array(arena[arena.isin(filter_dict['arena'])].index)
-
     # Find battles within a given trophy range
     if (filter_dict['team_trophy_count_range'] == []):
         trophy_inds = np.array(range(len(team_trophy_count)))
@@ -209,7 +197,7 @@ def process_data(data, filter_dict):
         messages.append('You have not played any opponents with this combination of cards.')
 
     # Find intersection of all filters except wins
-    all_inds = [time_inds, game_mode_inds, arena_inds, trophy_inds, team_card_inds, opponent_card_inds]
+    all_inds = [time_inds, game_mode_inds, trophy_inds, team_card_inds, opponent_card_inds]
     shared_inds = np.array(list(set(all_inds[0]).intersection(*all_inds[1:])))
 
     if len(shared_inds) != 0:
@@ -237,7 +225,6 @@ def process_data(data, filter_dict):
         'opponent_cards':[],
         'team_trophy_count':[],
         'game_mode':[],
-        'arena':[],
         'win_loss':[]
     }:
         messages = ['You don\'t have any 1v1 battles to analyze right now. Play some battles and try again!']
@@ -271,8 +258,7 @@ def process_and_return_data(filter_dict=None):
             'opponent_cards':[],
             'team_trophy_count_range':[],
             'battle_time_range':[],
-            'game_modes':[],
-            'arena':[]
+            'game_modes':[]
         }
     processed_win_stats, all_opponent_card_plays, messages, num_battles, total_win_rate = process_data(PROCESSED_BATTLES, filter_dict)
     cards = []
@@ -298,7 +284,7 @@ def process_front_page():
         return jsonify(player_error_flag=player_error_flag)
     else:
         global PROCESSED_BATTLES
-        PROCESSED_BATTLES, your_team_cards, opponent_team_cards, game_modes, arenas, trophy_dict = process_battles(player_tag, battles)
+        PROCESSED_BATTLES, your_team_cards, opponent_team_cards, game_modes, trophy_dict = process_battles(player_tag, battles)
 
         cards, play_counts, win_percents, messages, num_battles, total_win_rate = process_and_return_data()
 
@@ -309,7 +295,6 @@ def process_front_page():
                        your_team_cards=your_team_cards,
                        opponent_team_cards=opponent_team_cards,
                        game_modes=game_modes,
-                       arenas=arenas,
                        min_trophy=trophy_dict['min'],
                        max_trophy=trophy_dict['max'],
                        num_battles=num_battles,
@@ -331,7 +316,6 @@ def process_filter():
     your_team_filter_values = content.get('your_team_filter')
     opponent_team_filter_values = content.get('opponent_team_filter')
     game_mode_filter_values = content.get('game_mode_filter')
-    arena_filter_values = [] #content.get('arena_filter')
     battle_time_filter_values = clean_battle_time_filter(content.get('battle_time_filter'))
     min_trophy, max_trophy = clean_trophy_filter(content.get('trophy_filter'))
 
@@ -341,7 +325,6 @@ def process_filter():
         'team_trophy_count_range':[min_trophy, max_trophy],
         'battle_time_range':battle_time_filter_values,
         'game_modes':game_mode_filter_values,
-        'arena':arena_filter_values
     }
 
     cards, play_counts, win_percents, messages, num_battles, total_win_rate = process_and_return_data(filter_dict)
