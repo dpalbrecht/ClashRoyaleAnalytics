@@ -32,16 +32,16 @@ def get_battles(player_tag):
         player_tag = player_tag[1:]
 
     # Get battle profile and check for errors
-    profile_response = requests.get('https://api.clashroyale.com/v1/players/%23{}'.format(player_tag),
-        headers=HEADER)
-    profile_response = eval(profile_response.text.replace('false', 'False').replace('true', 'True').replace('null','None'))
+    response = requests.post('https://us-central1-royaleapp.cloudfunctions.net/getprofile',
+                             json={'player_tag':player_tag})
+    profile_response = eval(response.content)
     if profile_response.get('tag') is None:
         player_error_flag = True
 
     # Get battle logs
-    battles_response = requests.get('https://api.clashroyale.com/v1/players/%23{}/battlelog'.format(player_tag),
-        headers=HEADER)
-    battles_response = eval(battles_response.text.replace('false', 'False').replace('true', 'True').replace('null','None'))
+    response = requests.post('https://us-central1-royaleapp.cloudfunctions.net/getbattles',
+                             json={'player_tag':player_tag})
+    battles_response = eval(response.content)
 
     return player_error_flag, profile_response, battles_response
 
