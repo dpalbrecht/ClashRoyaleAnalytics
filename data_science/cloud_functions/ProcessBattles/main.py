@@ -91,7 +91,7 @@ def process_battles(request):
                 game_mode = clean_game_mode("{} - {}".format(battle['type'], battle['gameMode']['name']))
 
                 data['win_loss'].append(win_loss)
-                data['team_trophy_count'].append(team_trophy_count)
+                data['team_trophy_count'].append(int(team_trophy_count))
                 data['battle_time'].append(battle_time)
                 data['team_cards'].append(team_cards)
                 data['opponent_cards'].append(opponent_cards)
