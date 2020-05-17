@@ -51,6 +51,7 @@ function create_fill_filters(data, filter_id, limit, show_limit){
 };
 
 function create_filters(data){
+    window.processed_data = data['data'] // NEW
     set_trophy_slider(data['min_trophy'],
                       data['max_trophy'])
     create_fill_filters(data['your_team_cards'], '#your_team_filter', 8, true)
@@ -78,6 +79,9 @@ function get_filter_vals() {
         result[filter_names[i]] = selected_vals;
     }
     result['trophy_filter'] = document.getElementById('trophy_slider').value
+    result['test_filter'] = document.getElementById('trophy_slider').value
+    // result['data'] = window.processed_data
+    result['data'] = document.getElementById('trophy_slider').value
     submit_filters(result)
 };
 
