@@ -81,17 +81,6 @@ def process_battles(player_tag, battle_list):
     else:
         data = pickle.loads(blob.download_as_string())
 
-    # NEW
-    # for k, v in data.items():
-    #     new_v = []
-    #     for vv in v:
-    #         if isinstance(vv, np.ndarray):
-    #             vv = list(vv)
-    #         elif isinstance(vv, np.int32):
-    #             vv = int(vv)
-    #         new_v.append(vv)
-    #     data[k] = new_v
-
     # process battles and add to data
     # handle errors by skipping battles
     for battle in battle_list[::-1]:
@@ -124,7 +113,7 @@ def process_battles(player_tag, battle_list):
                 game_mode = clean_game_mode("{} - {}".format(battle['type'], battle['gameMode']['name']))
 
                 data['win_loss'].append(win_loss)
-                data['team_trophy_count'].append(int(team_trophy_count)) # TODO: Make this change to cloud functions
+                data['team_trophy_count'].append(int(team_trophy_count))
                 data['battle_time'].append(battle_time)
                 data['team_cards'].append(team_cards)
                 data['opponent_cards'].append(opponent_cards)
@@ -275,8 +264,7 @@ def process_and_return_data(data, filter_dict=None):
             'battle_time_range':[],
             'game_modes':[]
         }
-    # processed_win_stats, all_opponent_card_plays, messages, num_battles, total_win_rate = process_data(PROCESSED_BATTLES, filter_dict)
-    processed_win_stats, all_opponent_card_plays, messages, num_battles, total_win_rate = process_data(data, filter_dict) # NEW
+    processed_win_stats, all_opponent_card_plays, messages, num_battles, total_win_rate = process_data(data, filter_dict)
     cards = []
     win_percents = []
     play_counts = []
@@ -299,13 +287,8 @@ def process_front_page():
     if player_error_flag:
         return jsonify(player_error_flag=player_error_flag)
     else:
-        # global PROCESSED_BATTLES
-        # PROCESSED_BATTLES, your_team_cards, opponent_team_cards, game_modes, trophy_dict = process_battles(player_tag, battles)
-        data, your_team_cards, opponent_team_cards, game_modes, trophy_dict = process_battles(player_tag, battles) # NEW
-
-        # cards, play_counts, win_percents, messages, num_battles, total_win_rate = process_and_return_data()
-        cards, play_counts, win_percents, messages, num_battles, total_win_rate = process_and_return_data(data=data, filter_dict=None) # NEW
-        logging.info("Data Length: {}".format(len(data))) # NEW
+        data, your_team_cards, opponent_team_cards, game_modes, trophy_dict = process_battles(player_tag, battles)
+        cards, play_counts, win_percents, messages, num_battles, total_win_rate = process_and_return_data(data=data, filter_dict=None)
 
         return jsonify(cards=cards,
                        play_counts=play_counts,
@@ -333,15 +316,12 @@ def clean_battle_time_filter(raw_filter_list):
 @app.route('/filter', methods=['POST'])
 def process_filter():
     content = request.get_json()
-    logging.info(request)
-    logging.info(content)
     your_team_filter_values = content.get('your_team_filter')
     opponent_team_filter_values = content.get('opponent_team_filter')
     game_mode_filter_values = content.get('game_mode_filter')
     battle_time_filter_values = clean_battle_time_filter(content.get('battle_time_filter'))
     min_trophy, max_trophy = clean_trophy_filter(content.get('trophy_filter'))
     data = content.get('data')
-    logging.info("Data Length: {}".format(len(data))) # NEW
 
     filter_dict = {
         'team_cards':your_team_filter_values,

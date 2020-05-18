@@ -44,6 +44,8 @@
     padding: 5%;
     background-color: rgba(0, 0, 0, 0.5);
     color: white;
+    max-width: -webkit-fit-content;
+    max-width: -moz-fit-content;
     max-width: fit-content;
 }
 
@@ -163,7 +165,6 @@
   background: #d3d3d3;
   outline: none;
   opacity: 0.7;
-  -webkit-transition: .2s;
   transition: opacity .2s;
 }
 .slider:hover {
@@ -186,42 +187,6 @@
 #trophy_range_td {
     width: 280px;
 }
-
-
-/* NEW FILTERS */
-
-/* .selectize-input {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    background-color: rgba(0,0,0,1);
-    border: 5px white;
-}
-
-.selectize-input:hover {
-    background-color: rgba(0,0,25,.75);
-    cursor: pointer;
-}
-
-.selectize-input div.item {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
-
-a.remove {
-    display: flex !important;
-    justify-content: center !important;
-    align-items: center !important;
-    font-family: clashFont;
-}
-
-.selectize-input div.item {
-    max-height: 25px;
-    font-family: clashFont;
-    color: black;
-    font-size: 10px;
-} */
 
 .search-bar {
   height: 100%;
@@ -246,7 +211,6 @@ a.remove {
   .search-bar .selectize-input {
     width: 240px !important
   }
-}
 
 .filters_table {
     border: none !important;
@@ -319,5 +283,24 @@ a.remove {
     margin-top: 10%;
     width: 10rem;
     height: 10rem;
+    -webkit-animation: spinner-grow 1s linear infinite;
     animation: spinner-grow 1s linear infinite;
+}
+
+/* Chrome, Safari, Opera */
+@-webkit-keyframes loader {
+    0% {
+    background: transparent;
+    left: -10px;
+    transform-origin: 10px 35px;
+  }
+  30% {
+    background: white;
+  }
+  100% {
+    background: transparent;
+    left: 10px;
+    transform-origin: -10px 35px;
+  }
+}
 }

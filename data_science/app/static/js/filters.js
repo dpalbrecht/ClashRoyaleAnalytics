@@ -79,9 +79,7 @@ function get_filter_vals() {
         result[filter_names[i]] = selected_vals;
     }
     result['trophy_filter'] = document.getElementById('trophy_slider').value
-    result['test_filter'] = document.getElementById('trophy_slider').value
-    // result['data'] = window.processed_data
-    result['data'] = document.getElementById('trophy_slider').value
+    result['data'] = window.processed_data
     submit_filters(result)
 };
 
