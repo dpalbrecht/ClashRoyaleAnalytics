@@ -304,3 +304,7 @@
   }
 }
 }
+
+input {
+    -webkit-user-select:text;
+}
