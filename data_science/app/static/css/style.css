@@ -26,12 +26,12 @@
     color: white;
 }
 
+
 #background_container {
     background-image: url('../clash_bg.png');
-	background-position:center;
-	background-repeat:no-repeat;
-	background-size:cover;
-    height: 100vh;
+	background-position: center;
+	background-repeat: no-repeat;
+	background-size: cover;
     overflow: auto;
 }
 
@@ -247,6 +247,10 @@
     border-width: .5px 1px .5px 1px;
 }
 
+.tail-select {
+
+}
+
 .irs {
     font-family: clashFont;
 }
@@ -279,20 +283,18 @@
     color: white;
 }
 
-#results_loading_spinner {
-    margin-top: 10%;
-    width: 10rem;
-    height: 10rem;
-    -webkit-animation: spinner-grow 1s linear infinite;
-    animation: spinner-grow 1s linear infinite;
-}
 
-/* Chrome, Safari, Opera */
+/**/
+/* Chrome, Safari,  Opera */
 @-webkit-keyframes loader {
     0% {
     background: transparent;
     left: -10px;
     transform-origin: 10px 35px;
+        -ms-transform-origin: 10px 35px;
+        -webkit-transform-origin: 10px 35px;
+        -moz-transform-origin: 10px 35px;
+        -o-transform-origin: 10px 35px;
   }
   30% {
     background: white;
@@ -301,10 +303,74 @@
     background: transparent;
     left: 10px;
     transform-origin: -10px 35px;
+    -ms-transform-origin: -10px 35px;
+    -webkit-transform-origin: -10px 35px;
+    -moz-transform-origin: -10px 35px;
+    -o-transform-origin: -10px 35px;
   }
-}
 }
 
 input {
     -webkit-user-select:text;
+}
+
+.tail-select input {
+    -webkit-user-select: text;
+    -khtml-user-select: text;
+    -moz-user-select: text;
+    -ms-user-select: text;
+    user-select: text;
+}
+
+
+@-webkit-keyframes pulse {
+    from {
+        -webkit-transform: scale(0);
+        transform: scale(0);
+    }
+
+    50% {
+        -webkit-transform: scale(1);
+        transform: scale(1);
+        opacity: 1;
+    }
+    to {
+        -webkit-transform: scale(0);
+        transform: scale(0);
+        opacity: 0;
+    }
+}
+
+@keyframes pulse {
+
+    from {
+        -webkit-transform: scale(0);
+        transform: scale(0);
+    }
+
+    50% {
+        -webkit-transform: scale(1);
+        transform: scale(1);
+        opacity: 1;
+    }
+    to {
+        -webkit-transform: scale(0);
+        transform: scale(0);
+        opacity: 0;
+    }
+}
+
+#results_loading_spinner {
+    width: 10rem;
+    height: 10rem;
+    animation-iteration-count: infinite;
+    display: inline-block;
+    vertical-align: text-bottom;
+    background-color: currentColor;
+    border-radius: 50%;
+    opacity: 0;
+    margin-bottom: 37px;
+    margin-top: 0;
+    animation-duration: 1s;
+    animation-timing-function: linear;
 }
