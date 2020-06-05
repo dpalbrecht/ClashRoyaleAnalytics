@@ -21,11 +21,11 @@ app = Flask(__name__)
 
 def get_card_images():
     card_dict = eval(requests.get('https://us-central1-royaleapp.cloudfunctions.net/getcardimages').text)
-    with open('static/card_images.json', 'w') as f:
+    with open('/tmp/card_images.json', 'w') as f:
         json.dump(card_dict, f)
     logging.info('Saved new card images dictionary.')
     global card_images_dict
-    card_images_dict = json.loads(open('static/card_images.json', 'r').read())
+    card_images_dict = json.loads(open('/tmp/card_images.json', 'r').read())
 scheduler = BackgroundScheduler()
 scheduler.add_job(func=get_card_images, trigger="interval", hours=24)
 scheduler.start()
