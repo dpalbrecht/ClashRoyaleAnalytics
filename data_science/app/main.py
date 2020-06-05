@@ -10,9 +10,27 @@ from collections import Counter
 import datetime
 from statsmodels.stats.proportion import proportion_confint
 import logging
+import time
+import atexit
+import json
+from apscheduler.schedulers.background import BackgroundScheduler
 logging.getLogger().setLevel(logging.INFO)
 
 app = Flask(__name__)
+
+
+def get_card_images():
+    card_dict = eval(requests.get('https://us-central1-royaleapp.cloudfunctions.net/getcardimages').text)
+    with open('static/card_images.json', 'w') as f:
+        json.dump(card_dict, f)
+    logging.info('Saved new card images dictionary.')
+    global card_images_dict
+    card_images_dict = json.loads(open('static/card_images.json', 'r').read())
+scheduler = BackgroundScheduler()
+scheduler.add_job(func=get_card_images, trigger="interval", hours=24)
+scheduler.start()
+atexit.register(lambda: scheduler.shutdown())
+get_card_images()
 
 
 @app.before_first_request
@@ -301,7 +319,8 @@ def process_front_page():
                        max_trophy=trophy_dict['max'],
                        num_battles=num_battles,
                        total_win_rate=total_win_rate,
-                       data=data)
+                       data=data,
+                       card_images_dict=card_images_dict)
 
 def clean_trophy_filter(raw_filter_values):
     split_vals = raw_filter_values.split(';')
@@ -338,7 +357,8 @@ def process_filter():
                    win_percents=win_percents,
                    messages=messages,
                    num_battles=num_battles,
-                   total_win_rate=total_win_rate)
+                   total_win_rate=total_win_rate,
+                   card_images_dict=card_images_dict)
 
 
 if __name__ == '__main__':
