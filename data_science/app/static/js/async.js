@@ -48,10 +48,12 @@ function render(data) {
 
     var result = "<div id=\"row results_table\"><div id=\"results_div\">"
     for (i = 0; i < cards.length; i+=1) {
+        if (typeof url_dict[cards[i]] !== 'undefined') {
             result += "<div class=\"col result_box\"><div>"+cards[i]+"</div>"
             result += "<div><img id=\"results_image\" src="+url_dict[cards[i]]+"></div>"
             result += "<div>Play Count: "+play_counts[i]+"</div>"
             result += "<div>Win Rate: "+win_percents[i]+"%</div></div>"
+        }
     }
     result += "</div></div>"
 
