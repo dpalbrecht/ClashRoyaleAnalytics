@@ -1,0 +1,75 @@
+{% extends "base.html" %}
+
+{% block content %}
+	<div class="container" id="banner_container">
+		<div class="row text-wrap">
+			<div class="col">
+				<h1 class="center" id="page_header">Welcome to Competition Clash!</h1>
+				<div id="page_subheader">
+					Want to win more?
+				</div>
+				<div id="clash_text">
+					<br>
+					<h5>Have you ever asked yourself these questions?</h5>
+					<ul>
+						<li>Am I playing well?</li>
+						<li>What cards do I play well against?</li>
+						<li>Have I really played against Golem 879,374 times in the last week?!</li>
+						<li>How could I change my deck to win more?</li>
+						<li>How can I change my deck to something familiar yet fresh?</li>
+					</ul>
+					<br><br>
+					We can help.
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<div class="container" id="main_container">
+		<div class="row text-wrap">
+			<div class="col">
+				<div id="message">
+					<h3>Enter your player tag and we'll help you win more:</h3>
+					<div class="smaller_font">
+						We've already helped people just like you learn more about how they play.
+						<br><br>
+						<div id="testimonial">
+							Dave, a dedicated player, said:
+							"I'm already less frustrated playing with my hog deck - I know PEKKA and Mega Knight are big challenges, but I didn't realize air defense was a big problem for me. I'm already having more fun and playing better. "
+						</div>
+					</div>
+					<br>
+					<div>
+						Don't wait. Win more today.
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<div class="row" id="top_form">
+			<form class="form-inline" id="form">
+			  <div class="form-group">
+				<label class="sr-only" for="seedInput">Name</label>
+				<input
+					type="text"
+					class="form-control"
+					id="seedInput"
+					placeholder="Player Tag"
+				>
+			  </div>
+			  <button type="submit" id="analyze_button" class="btn btn-primary">Win More!</button>
+			</form>
+		</div>
+
+		<div class="container" id="results_loading_div">
+			<div class="row m-auto">
+				<div class="col">
+					<div id="results_loading_text">
+						<strong>Loading...</strong>
+					</div>
+					<div class="animate__animated animate__pulse text-primary" id="results_loading_spinner" role="status"></div>
+				</div>
+			</div>
+		</div>
+	</div>
+{% endblock %}

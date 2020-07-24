@@ -1,0 +1,150 @@
+{% extends "base.html" %}
+
+{% block content %}
+	<script>
+	$(function() {
+		$("#trophy_slider").ionRangeSlider({
+			type: "double",
+			grid: true,
+			min: {{min_trophy}},
+			max: {{max_trophy}},
+			from: {{min_trophy}},
+			to: {{max_trophy}},
+			prefix: ""
+		});
+	});
+	$(function() {
+		tail.select("#your_team_filter", {
+	        multiple:true,
+			items:{{ your_team_cards|safe }},
+	        search: true,
+	        multiLimit:8,
+	        multiContainer:true,
+	        multiPinSelected:true,
+	        multiShowCount:true,
+	        multiShowLimit:true,
+	        deselect:true,
+	        searchMarked:false
+	    });
+	});
+	$(function() {
+		tail.select("#opponent_team_filter", {
+	        multiple:true,
+			items:{{ opponent_team_cards|safe }},
+	        search: true,
+	        multiLimit:8,
+	        multiContainer:true,
+	        multiPinSelected:true,
+	        multiShowCount:true,
+	        multiShowLimit:true,
+	        deselect:true,
+	        searchMarked:false
+	    });
+	});
+	$(function() {
+		tail.select("#game_mode_filter", {
+	        multiple:true,
+			items:{{ game_modes|safe }},
+	        search: true,
+	        multiLimit:Infinity,
+	        multiContainer:true,
+	        multiPinSelected:true,
+	        multiShowCount:false,
+	        multiShowLimit:true,
+	        deselect:true,
+	        searchMarked:false
+	    });
+	});
+	$(function() {
+		tail.select("#battle_time_filter", {
+	        multiple:true,
+			items:{{ battle_times|safe }},
+	        search: true,
+	        multiLimit:1,
+	        multiContainer:true,
+	        multiPinSelected:true,
+	        multiShowCount:true,
+	        multiShowLimit:true,
+	        deselect:true,
+	        searchMarked:false
+	    });
+	});
+	window.processed_data = {{ data|tojson }};
+	var messages = {{ messages|tojson }}
+	$(function () {
+		if (messages.length > 0) {
+	    	console.log(messages);
+			setTimeout(function() {show_messages(messages)},10)
+		}
+	});
+	</script>
+
+	<div class="container" id="banner_container">
+		<div class="row text-wrap">
+			<div class="col">
+				<h1 class="center" id="page_header">Check out your results!</h1>
+				<div id="page_subheader">
+					Use the filters and uncover how you could win more.
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<div class="container" id="results_container">
+		<div class="row hl">
+			<div class="col" id="overall_stats_div">
+				<div>
+					Overall Win Rate: <div id="win_rate_div">{{total_win_rate}}%</div>
+				</div>
+				<div>
+					Number of Games Analyzed: <div id="num_games_div">{{num_battles}}</div>
+				</div>
+			</div>
+		</div>
+
+		<div class="row">
+			<table class="filters_table">
+				<tr>
+					<td class="filter_label">Your Deck Has:</td>
+					<td><select id="your_team_filter" placeholder="No Filter"></select></td>
+				</tr>
+				<tr class="filters_spacer"></tr>
+				<tr>
+					<td class="filter_label">Opponent's Deck Has:</td>
+					<td><select id="opponent_team_filter" placeholder="No Filter"></select></td>
+				</tr>
+				<tr class="filters_spacer"></tr>
+				<tr>
+					<td class="filter_label">Game Mode:</td>
+					<td><select id="game_mode_filter" placeholder="No Filter"></select></td>
+				</tr>
+				<tr class="filters_spacer"></tr>
+				<tr>
+					<td class="filter_label">Battle Time:</td>
+					<td><select id="battle_time_filter" placeholder="No Filter"></select></td>
+				</tr>
+				<tr class="filters_spacer"></tr>
+				<tr style="display:none;">
+					<td class="filter_label">Trophy Range:</td>
+					<td id="trophy_range_td"><input type="text" id="trophy_slider" value="" /></td>
+				</tr>
+				<!-- <tr class="filters_spacer"></tr> -->
+			</table>
+		</div>
+
+		<div class="row" id="stats_results">
+			<div id="row results_table">
+				<div id="results_div">
+					{% for tile_data in dashboard_data %}
+					 	<div class="col result_box">
+							<div>{{tile_data[0]}}</div>
+							<div><img id="results_image" src={{tile_data[3]}}></div>
+							<div>Play Count: {{tile_data[1]}}</div>
+							<div>Win Rate: {{tile_data[2]}}%</div>
+						</div>
+					{% endfor %}
+				</div>
+			</div>
+		</div>
+	</div>
+{% endblock %}
