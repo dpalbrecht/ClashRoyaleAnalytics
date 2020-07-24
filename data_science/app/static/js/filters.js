@@ -1,15 +1,3 @@
-function set_trophy_slider (min_val, max_val) {
-    $("#trophy_slider").ionRangeSlider({
-        type: "double",
-        grid: true,
-        min: min_val,
-        max: max_val,
-        from: min_val,
-        to: max_val,
-        prefix: ""
-    });
-}
-
 $("#trophy_slider").on("change", function () {
     get_filter_vals()
 });
@@ -27,38 +15,9 @@ async function submit_filters(results_dict) {
     show_number_games(data)
     show_win_rate(data)
     if (data['messages'].length > 0) {
-        setTimeout(function() {show_messages(data)},10)
+        setTimeout(function() {show_messages(data['messages'])},10)
     };
 }
-
-function create_fill_filters(data, filter_id, limit, show_limit){
-    var data_values = []
-    for (i = 0; i < data.length; i++) {
-        data_values.push({'value':data[i], 'text':data[i]});
-    };
-    tail.select(filter_id, {
-        multiple:true,
-        items:data_values,
-        search: true,
-        multiLimit:limit,
-        multiContainer:true,
-        multiPinSelected:true,
-        multiShowCount:show_limit,
-        multiShowLimit:true,
-        deselect:true,
-        searchMarked:false
-    });
-};
-
-function create_filters(data){
-    window.processed_data = data['data'] // NEW
-    set_trophy_slider(data['min_trophy'],
-                      data['max_trophy'])
-    create_fill_filters(data['your_team_cards'], '#your_team_filter', 8, true)
-    create_fill_filters(data['opponent_team_cards'], '#opponent_team_filter', 8, true)
-    create_fill_filters(data['game_modes'], '#game_mode_filter', Infinity, false)
-    create_fill_filters(['Last Day', 'Last Week', 'Last Month'], '#battle_time_filter', 1, true)
-};
 
 function get_filter_vals() {
     var filter_names = [

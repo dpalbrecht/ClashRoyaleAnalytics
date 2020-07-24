@@ -20,12 +20,9 @@ app = Flask(__name__)
 
 
 def get_card_images():
-    card_dict = eval(requests.get('https://us-central1-royaleapp.cloudfunctions.net/getcardimages').text)
-    with open('/tmp/card_images.json', 'w') as f:
-        json.dump(card_dict, f)
-    logging.info('Saved new card images dictionary.')
     global card_images_dict
-    card_images_dict = json.loads(open('/tmp/card_images.json', 'r').read())
+    card_images_dict = eval(requests.get('https://us-central1-royaleapp.cloudfunctions.net/getcardimages').text)
+    logging.info('Saved new card images dictionary.')
 scheduler = BackgroundScheduler()
 scheduler.add_job(func=get_card_images, trigger="interval", hours=24)
 scheduler.start()
@@ -59,11 +56,13 @@ def get_battles(player_tag):
     profile_response = eval(response.content)
     if profile_response.get('tag') is None:
         player_error_flag = True
+        battles_response = None
 
     # Get battle logs
-    response = requests.post('https://us-central1-royaleapp.cloudfunctions.net/getbattles',
-                             json={'player_tag':player_tag})
-    battles_response = eval(response.content)
+    if not player_error_flag:
+        response = requests.post('https://us-central1-royaleapp.cloudfunctions.net/getbattles',
+                                 json={'player_tag':player_tag})
+        battles_response = eval(response.content)
 
     return player_error_flag, profile_response, battles_response
 
@@ -143,7 +142,11 @@ def process_battles(player_tag, battle_list):
     local_fname = LOCAL_FNAME_PREFIX + '{}.p'.format(player_tag)
     with open(local_fname, 'wb') as f:
         pickle.dump(data, f)
-    BUCKET.blob('user_data/{}.p'.format(player_tag)).upload_from_file(open(local_fname, 'rb'))
+    # TODO: use upload_from_string here and in other cloud functions after deployment. The structure is otherwise the same so only read/write needs to be changed.
+    # Upload data: BUCKET.blob('user_data/{}.json'.format(player_tag)).upload_from_string(json.dumps(data),content_type='application/octet-stream')
+    # Read data: json.loads(BUCKET.get_blob('user_data/{}.json'.format(player_tag)).download_as_string())
+    with open(local_fname, 'rb') as f:
+        BUCKET.blob('user_data/{}.p'.format(player_tag)).upload_from_file(f)
     os.remove(local_fname)
 
     # Get all available team cards
@@ -295,32 +298,37 @@ def process_and_return_data(data, filter_dict=None):
 
     return cards, play_counts, win_percents, messages, num_battles, total_win_rate
 
-@app.route('/process', methods=['POST'])
-def process_front_page():
-    content = request.get_json()
-    player_tag = content.get('player_tag')
-
+@app.route('/process/<player_tag>', methods=['GET', 'POST'])
+def process_front_page(player_tag):
     player_error_flag, player_profile, battles = get_battles(player_tag)
 
     if player_error_flag:
-        return jsonify(player_error_flag=player_error_flag)
+        return render_template('index.html'), 201
     else:
         data, your_team_cards, opponent_team_cards, game_modes, trophy_dict = process_battles(player_tag, battles)
         cards, play_counts, win_percents, messages, num_battles, total_win_rate = process_and_return_data(data=data, filter_dict=None)
-
-        return jsonify(cards=cards,
-                       play_counts=play_counts,
-                       win_percents=win_percents,
-                       messages=messages,
-                       your_team_cards=your_team_cards,
-                       opponent_team_cards=opponent_team_cards,
-                       game_modes=game_modes,
-                       min_trophy=trophy_dict['min'],
-                       max_trophy=trophy_dict['max'],
-                       num_battles=num_battles,
-                       total_win_rate=total_win_rate,
-                       data=data,
-                       card_images_dict=card_images_dict)
+        dashboard_data = []
+        for n, card in enumerate(cards):
+            if card_images_dict.get(card) is not None:
+                dashboard_data.append([card, play_counts[n], win_percents[n], card_images_dict[card]])
+        return render_template(
+            'dashboard.html',
+            play_counts=play_counts,
+            win_percents=win_percents,
+            messages=messages,
+            your_team_cards=[{'value':c, 'text':c} for c in your_team_cards],
+            opponent_team_cards=[{'value':c, 'text':c} for c in opponent_team_cards],
+            game_modes=[{'value':g, 'text':g} for g in game_modes],
+            battle_times=[{'value':t, 'text':t} for t in ['Last Day', 'Last Week', 'Last Month']],
+            min_trophy=trophy_dict['min'],
+            max_trophy=trophy_dict['max'],
+            num_battles=num_battles,
+            total_win_rate=total_win_rate,
+            data=data,
+            dashboard_data=dashboard_data,
+            card_images_dict=card_images_dict,
+            player_tag=player_tag
+        ), 200
 
 def clean_trophy_filter(raw_filter_values):
     split_vals = raw_filter_values.split(';')

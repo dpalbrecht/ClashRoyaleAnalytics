@@ -152,7 +152,7 @@ body:after {
 }
 
 #results_container {
-    display: none;
+    display: inherit;
 }
 
 #results_table {
