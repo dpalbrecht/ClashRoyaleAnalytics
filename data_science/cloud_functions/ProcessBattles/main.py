@@ -3,6 +3,7 @@ import pickle
 import requests
 import os
 import numpy as np
+import json
 import logging
 logging.getLogger().setLevel(logging.INFO)
 
@@ -40,7 +41,7 @@ def process_battles(request):
     player_tag = data['player_tag']
     # read in data from storage
     # if no data, create data
-    blob = BUCKET.get_blob('user_data/{}.p'.format(player_tag))
+    blob = BUCKET.get_blob('user_data/{}.json'.format(player_tag))
     if blob is None:
         data = {
             'battle_time':[],
@@ -51,7 +52,7 @@ def process_battles(request):
             'win_loss':[]
         }
     else:
-        data = pickle.loads(blob.download_as_string())
+        data = json.loads(blob.download_as_string())
     # process battles and add to data
     response = requests.get('https://api.clashroyale.com/v1/players/%23{}/battlelog'.format(player_tag),
                             headers={"Authorization": "Bearer {}".format(TOKEN)})
@@ -102,8 +103,4 @@ def process_battles(request):
     after_data_length = len(data['win_loss'])
     logging.info('Player {} went from {} battles to {} battles logged.'.format(player_tag, before_data_length, after_data_length))
     # save to storage
-    local_fname = '/tmp/{}.p'.format(player_tag)
-    with open(local_fname, 'wb') as f:
-        pickle.dump(data, f)
-    BUCKET.blob('user_data/{}.p'.format(player_tag)).upload_from_file(open(local_fname, 'rb'))
-    os.remove(local_fname)
+    BUCKET.blob('user_data/{}.json'.format(player_tag)).upload_from_string(json.dumps(data),content_type='application/octet-stream')

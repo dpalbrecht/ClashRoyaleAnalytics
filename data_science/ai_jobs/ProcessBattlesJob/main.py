@@ -14,7 +14,7 @@ def read_player_tags():
     client = storage.Client()
     bucket = client.bucket('royale-data')
     blobs = bucket.list_blobs(prefix='user_data')
-    player_tags = [blob.name.split('/')[1][:-2] for blob in blobs if blob.name.endswith('.p')]
+    player_tags = [blob.name.split('/')[1][:-5] for blob in blobs if blob.name.endswith('.json')]
     return player_tags
 
 async def call_process_battles(player_tags):
