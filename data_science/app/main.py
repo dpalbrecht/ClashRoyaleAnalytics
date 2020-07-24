@@ -85,7 +85,7 @@ def process_battles(player_tag, battle_list):
     # if no data, create data
     if player_tag.startswith('#'):
         player_tag = player_tag[1:]
-    blob = BUCKET.get_blob('user_data/{}.p'.format(player_tag))
+    blob = BUCKET.get_blob('user_data/{}.json'.format(player_tag))
     if blob is None:
         data = {
             'battle_time':[],
@@ -96,8 +96,7 @@ def process_battles(player_tag, battle_list):
             'win_loss':[]
         }
     else:
-        data = pickle.loads(blob.download_as_string())
-
+        data = json.loads(blob.download_as_string())
     # process battles and add to data
     # handle errors by skipping battles
     for battle in battle_list[::-1]:
@@ -139,15 +138,7 @@ def process_battles(player_tag, battle_list):
             continue
 
     # save to storage
-    local_fname = LOCAL_FNAME_PREFIX + '{}.p'.format(player_tag)
-    with open(local_fname, 'wb') as f:
-        pickle.dump(data, f)
-    # TODO: use upload_from_string here and in other cloud functions after deployment. The structure is otherwise the same so only read/write needs to be changed.
-    # Upload data: BUCKET.blob('user_data/{}.json'.format(player_tag)).upload_from_string(json.dumps(data),content_type='application/octet-stream')
-    # Read data: json.loads(BUCKET.get_blob('user_data/{}.json'.format(player_tag)).download_as_string())
-    with open(local_fname, 'rb') as f:
-        BUCKET.blob('user_data/{}.p'.format(player_tag)).upload_from_file(f)
-    os.remove(local_fname)
+    BUCKET.blob('user_data/{}.json'.format(player_tag)).upload_from_string(json.dumps(data),content_type='application/octet-stream')
 
     # Get all available team cards
     your_team_cards = sorted(set(itertools.chain(*data['team_cards'])))
