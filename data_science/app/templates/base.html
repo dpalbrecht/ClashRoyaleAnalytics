@@ -19,6 +19,15 @@
 </head>
 <body>
 	<div id="background_container">
+		<header id="header_banner">
+			<div id="home_button_div">
+				<button type="submit" id="home_button" class="btn btn-primary">Home</button>
+			</div>
+			<div id="deck_rec_div">
+				<button type="submit" id="deck_rec_button" class="btn btn-primary">Find New Decks</button>
+			</div>
+		</header>
+
 		{% block content %}{% endblock %}
 
 		<footer id="footer_policy">
@@ -36,6 +45,7 @@
 	<script src="https://cdn.jsdelivr.net/npm/tail.select@0.5.15/js/tail.select-full.min.js"></script>
 	<script src="{{ url_for('static', filename='js/async.js') }}"></script>
 	<script src="{{ url_for('static', filename='js/filters.js') }}"></script>
+	<script src="{{ url_for('static', filename='js/new_decks.js') }}"></script>
 
 </body>
 </html>

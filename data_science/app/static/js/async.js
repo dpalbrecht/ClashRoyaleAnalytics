@@ -1,3 +1,11 @@
+$("#home_button").on("click", function () {
+    window.location.href = '/'
+});
+
+$("#deck_rec_button").on("click", function () {
+    window.location.href = '/new_decks'
+});
+
 $(document).on('submit', '#form', (event) => {
     event.preventDefault()
     const seedValue = $('#seedInput').val()

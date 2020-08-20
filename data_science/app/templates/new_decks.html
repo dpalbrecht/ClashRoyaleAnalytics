@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+
+{% block content %}
+	<script>
+	$(function() {
+		tail.select("#possible_cards_filter", {
+			multiple:true,
+			items:{{ possible_cards|safe }},
+			search: true,
+			multiLimit:8,
+			multiContainer:true,
+			multiPinSelected:true,
+			multiShowCount:true,
+			multiShowLimit:true,
+			deselect:true,
+			searchMarked:false,
+			multiContainer: ".tail-move-container",
+			multiPinSelected:true
+		});
+	});
+	window.card_images_dict = {{ card_images_dict|tojson }};
+	</script>
+
+	<div class="container" id="banner_container">
+		<h3 class="center" id="page_header">Find New Decks!</h1>
+	</div>
+
+	<div class="container">
+		<div class="row">
+			<table class="filters_table">
+				<tr>
+					<td class="filter_label">Find Decks Like:</td>
+					<td><select id="possible_cards_filter" placeholder="Choose 8 Cards"></select></td>
+				</tr>
+				<tr class="filters_spacer"></tr>
+			</table>
+		</div>
+	</div>
+
+	<div class="container">
+		<div class="row">
+			<div id="row base_deck_table">
+				<div id="base_deck_div">
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<div class="container" id="submit_new_deck_container">
+		<div class="row">
+			<div>
+				<button type="submit" id="submit_new_decks" class="btn btn-primary" disabled>Find New Decks</button>
+			</div>
+		</div>
+	</div>
+
+	<div class="container" id="show_new_deck_container">
+	</div>
+{% endblock %}

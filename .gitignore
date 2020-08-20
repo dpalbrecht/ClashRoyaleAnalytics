@@ -2,3 +2,4 @@
 *.p
 *.json
 /tmp
+/__pycache__

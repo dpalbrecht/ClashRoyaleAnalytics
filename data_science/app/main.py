@@ -13,6 +13,12 @@ import logging
 import time
 import atexit
 import json
+import tempfile
+from io import BytesIO
+from annoy import AnnoyIndex
+from sklearn.preprocessing import normalize
+from statsmodels.stats.proportion import proportion_confint
+from operator import itemgetter
 from apscheduler.schedulers.background import BackgroundScheduler
 logging.getLogger().setLevel(logging.INFO)
 
@@ -32,16 +38,85 @@ get_card_images()
 
 @app.before_first_request
 def load_vars():
-    global TOKEN, CLIENT, BUCKET, HEADER, LOCAL_FNAME_PREFIX
+    global TOKEN, CLIENT, BUCKET, HEADER, STATS_DICT, DECK_WIN_DICT, INDEX2ID, MODEL
     TOKEN = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzUxMiIsImtpZCI6IjI4YTMxOGY3LTAwMDAtYTFlYi03ZmExLTJjNzQzM2M2Y2NhNSJ9.eyJpc3MiOiJzdXBlcmNlbGwiLCJhdWQiOiJzdXBlcmNlbGw6Z2FtZWFwaSIsImp0aSI6ImQ1ZWI1Nzk0LThjZjgtNDVlNi05ZGFjLWIzYmU5ZTBkMTVjOSIsImlhdCI6MTU4NTg3NDg3MSwic3ViIjoiZGV2ZWxvcGVyLzE4OGM5NTY0LWFhYjgtZWYzNS02ZTdiLTcwZWJmZWNmMzBhNCIsInNjb3BlcyI6WyJyb3lhbGUiXSwibGltaXRzIjpbeyJ0aWVyIjoiZGV2ZWxvcGVyL3NpbHZlciIsInR5cGUiOiJ0aHJvdHRsaW5nIn0seyJjaWRycyI6WyI3Ni4xNzYuMjkuNzUiXSwidHlwZSI6ImNsaWVudCJ9XX0.mJ4gkJKHYKEbs95og1DM3OybAieXjC5ypC2dVh0IQYRviu3R9FJmyZTwC3YB0yrjvpg8NpCsZDvUDtrcwEz_IQ"
     HEADER = {"Authorization": "Bearer {}".format(TOKEN)}
     try:
         CLIENT = storage.Client()
-        LOCAL_FNAME_PREFIX = "/tmp/"
     except:
-        LOCAL_FNAME_PREFIX = ""
         CLIENT = storage.Client.from_service_account_json('../royaleapp-296a6cea39ad.json')
     BUCKET = CLIENT.bucket('royale-data')
+
+    df = get_latest_file('card_stats.xlsx')
+    STATS_DICT = dict(zip(df['name'], df.values[:,1:]))
+    DECK_WIN_DICT = get_latest_file('deck_win_dict.json')
+    INDEX2ID = get_latest_file('index2id.json')
+    MODEL = get_latest_file('deck_recommender.ann')
+
+def get_latest_file(fname, folder_name='live_app_data'):
+    blobs = BUCKET.list_blobs(prefix=folder_name)
+    fname_blobs = [b.name.split('/')[1] for b in blobs if fname in b.name]
+    latest_fname = sorted(fname_blobs)[-1]
+    latest_fname_blob = BUCKET.get_blob(folder_name+'/'+latest_fname)
+    if latest_fname.endswith('.json'):
+        data = json.loads(latest_fname_blob.download_as_string())
+    elif latest_fname.endswith('.xlsx'):
+        data = pd.read_excel(BytesIO(latest_fname_blob.download_as_string()))
+    elif latest_fname.endswith('.ann'):
+        temp_file = tempfile.NamedTemporaryFile(mode='w', delete=False)
+        latest_fname_blob.download_to_filename(temp_file.name)
+        data = AnnoyIndex(714, 'dot')
+        data.load(temp_file.name)
+        temp_file.close()
+        try:
+            os.remove(temp_file.name)
+        except:
+            pass
+    logging.info(f"{latest_fname} loaded.")
+    return data
+
+def get_deck_recs(deck_cards, n_recs=25, rank_by_wins=False):
+    deck_cards = sorted(deck_cards)
+    search_cards = []
+    for c in deck_cards:
+        try:
+            search_cards.append(STATS_DICT[c])
+        except:
+            pass
+    search_vec = np.percentile(np.array(search_cards), list(np.arange(0,105,5)), axis=0).flatten()
+    norm_search_vec = normalize(search_vec.reshape(-1, 1), norm='l2', axis=0)
+    rec_inds, scores = MODEL.get_nns_by_vector(norm_search_vec, n_recs*2, include_distances=True)
+
+    # Rank recommendations
+    if rank_by_wins:
+        out = []
+        for rec_ind, score in zip(rec_inds, scores):
+            if INDEX2ID[str(rec_ind)] == str(deck_cards):
+                continue
+            deck_data = DECK_WIN_DICT[INDEX2ID[str(rec_ind)]]
+            int_play_counts = deck_data['play_count']
+            float_win_percs = deck_data['win_rate']
+            win_confidence = proportion_confint(np.round(float_win_percs*int_play_counts).astype(int), int_play_counts, alpha=0.05, method='wilson')[0]
+            out.append([INDEX2ID[str(rec_ind)], int_play_counts, float_win_percs, score, win_confidence*score])
+        recs = [eval(o[0]) for o in sorted(out, key=itemgetter(4), reverse=True)[:n_recs]]
+    else:
+        recs = [eval(INDEX2ID[str(rec_ind)]) for rec_ind in rec_inds[:n_recs]]
+
+    return recs
+
+@app.route('/new_decks')
+def new_decks():
+    return render_template('new_decks.html',
+                            card_images_dict=card_images_dict,
+                            possible_cards=[{'value':c, 'text':c} for c in list(card_images_dict.keys())])
+
+@app.route('/find_new_decks', methods=['GET', 'POST'])
+def find_new_decks():
+    content = request.get_json()
+    results = get_deck_recs(content.get('selected_cards'))
+    return jsonify(new_decks=results)
+
+
 
 
 def get_battles(player_tag):

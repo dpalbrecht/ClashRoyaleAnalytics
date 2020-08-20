@@ -143,6 +143,17 @@ body:after {
     margin: 1% auto;
 }
 
+#num_result_box {
+    padding-top: 50px;
+    max-width: 120px;
+    font-family: clashFont;
+    text-align: center;
+    color: white;
+    font-size: 3em;
+    float: none;
+    margin: 1% auto;
+}
+
 #num_games_div {
     display: inline;
 }
@@ -284,6 +295,10 @@ body:after {
     height: 10px;
 }
 
+#new_decks_spacer {
+    height: 50px;
+}
+
 .tail-select .select-dropdown ul li.dropdown-option {
     font-family: clashFont;
     list-style-position: inside;
@@ -299,8 +314,22 @@ body:after {
     font-family: clashFont;
 }
 
+#header_banner {
+    margin-bottom: 50px;
+    border-top: 2px solid black;
+    display: flex;
+    background: rgba(0, 0, 0, .6);
+    padding: 25px 100px;
+}
+
+@media (max-width: 767px) {
+    #header_banner {
+        padding: 20px 30px;
+    }
+}
+
 #footer_policy {
-    margin-top: 50px;
+    margin-top: 150px;
     border-top: 2px solid black;
     display: flex;
     background: rgba(0, 0, 0, .6);
@@ -326,6 +355,16 @@ body:after {
     text-align: center;
     color: white;
     margin-top: 10%;
+}
+
+#home_button_div {
+    margin-right: 10px;
+    font-family: clashFont;
+}
+
+#deck_rec_div {
+    margin-left: 10px;
+    font-family: clashFont;
 }
 
 
@@ -418,4 +457,24 @@ input {
     margin-top: 0;
     animation-duration: 1s;
     animation-timing-function: linear;
+}
+
+#base_deck_table {
+    margin: auto;
+    text-align: center;
+    font-family: clashFont;
+    font-size: 12px;
+    color: white;
+}
+
+#base_deck_div {
+    display: flex !important;
+    flex-wrap: wrap !important;
+    margin-top: 5px;
+}
+
+#submit_new_deck_container {
+    margin-top: 10px;
+    margin-bottom: 50px;
+    font-family: clashFont;
 }
