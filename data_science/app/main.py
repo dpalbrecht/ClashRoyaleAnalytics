@@ -88,19 +88,19 @@ def get_deck_recs(deck_cards, n_recs=25, rank_by_wins=False):
     rec_inds, scores = MODEL.get_nns_by_vector(norm_search_vec, n_recs*2, include_distances=True)
 
     # Rank recommendations
+    out = []
+    for rec_ind, score in zip(rec_inds, scores):
+        if INDEX2ID[str(rec_ind)] == str(deck_cards):
+            continue
+        deck_data = DECK_WIN_DICT[INDEX2ID[str(rec_ind)]]
+        int_play_counts = deck_data['play_count']
+        float_win_percs = deck_data['win_rate']
+        win_confidence = proportion_confint(np.round(float_win_percs*int_play_counts).astype(int), int_play_counts, alpha=0.05, method='wilson')[0]
+        out.append([INDEX2ID[str(rec_ind)], int_play_counts, float_win_percs, score, win_confidence*score])
     if rank_by_wins:
-        out = []
-        for rec_ind, score in zip(rec_inds, scores):
-            if INDEX2ID[str(rec_ind)] == str(deck_cards):
-                continue
-            deck_data = DECK_WIN_DICT[INDEX2ID[str(rec_ind)]]
-            int_play_counts = deck_data['play_count']
-            float_win_percs = deck_data['win_rate']
-            win_confidence = proportion_confint(np.round(float_win_percs*int_play_counts).astype(int), int_play_counts, alpha=0.05, method='wilson')[0]
-            out.append([INDEX2ID[str(rec_ind)], int_play_counts, float_win_percs, score, win_confidence*score])
         recs = [eval(o[0]) for o in sorted(out, key=itemgetter(4), reverse=True)[:n_recs]]
     else:
-        recs = [eval(INDEX2ID[str(rec_ind)]) for rec_ind in rec_inds[:n_recs]]
+        recs = [eval(o[0]) for o in sorted(out, key=itemgetter(3), reverse=True)[:n_recs]]
 
     return recs
 
