@@ -26,8 +26,14 @@ ONE_HOT_WINCON_DECK_MATRIX = read_file('one_hot_wincon_deck_matrix.p')
 NORMED_DECK_COUNTS = read_file('normed_deck_counts.p')
 DECKS = read_file('decks.p')
 
-def ind2deck(input_inds, input_deck):
-    return [DECKS[r] for r in input_inds if DECKS[r] != input_deck]
+def ind2deck(input_inds, input_deck, n_recs):
+    result = []
+    for r in input_inds:
+        if DECKS[r] != input_deck:
+            result.append(DECKS[r])
+        if len(result) == n_recs:
+            break
+    return result
     
 def get_recs(request):
     inputs = request.get_json()
@@ -71,28 +77,32 @@ def get_recs(request):
     blended_sims = rec_sims*.5 + onehot_rec_sims*.5
     blended_wincon_rec_sims = onehot_wincon_embedding.dot(ONE_HOT_WINCON_DECK_MATRIX.T)*.5 + rec_sims*.5
 
-    rec_inds = np.argsort(rec_sims)[::-1][:n_recs]
-    onehot_rec_inds = np.argsort(onehot_rec_sims)[::-1][:n_recs]
-    blended_rec_inds = np.argsort(blended_sims)[::-1][:n_recs]
+    rec_inds = np.argsort(rec_sims)[::-1]
+    onehot_rec_inds = np.argsort(onehot_rec_sims)[::-1]
+    blended_rec_inds = np.argsort(blended_sims)[::-1]
     blended_wincon_rec_inds = np.argsort(blended_wincon_rec_sims)[::-1]
     blended_wincon_playcount_rec_decks = [(DECKS[ind], blended_wincon_rec_sims[ind]*0.5+NORMED_DECK_COUNTS[str(DECKS[ind])]*0.5) \
-                                          for ind in blended_wincon_rec_inds[:50]] # TODO: Change back to n_recs*10
+                                          for ind in blended_wincon_rec_inds[:n_recs*10]]
     
     # Get stats recs
-    rec_dict['card_constants_recs'] = ind2deck(rec_inds, input_deck)
+    rec_dict['card_constants_recs'] = ind2deck(rec_inds, input_deck, n_recs)
     
     # Get one-hot recs
-    rec_dict['one_hot_recs'] = ind2deck(onehot_rec_inds, input_deck)
+    rec_dict['one_hot_recs'] = ind2deck(onehot_rec_inds, input_deck, n_recs)
     
     # Get 50/50 blended recs
-    rec_dict['5050_blended_recs'] = ind2deck(blended_rec_inds, input_deck)
+    rec_dict['5050_blended_recs'] = ind2deck(blended_rec_inds, input_deck, n_recs)
     
     # Get 50/50 wincon blended recs
-    rec_dict['5050_blended_wincon_recs'] = ind2deck(blended_wincon_rec_inds[:n_recs], input_deck) 
+    rec_dict['5050_blended_wincon_recs'] = ind2deck(blended_wincon_rec_inds, input_deck, n_recs) 
     
     # Get 50/50 wincon play count blended recs
-    rec_dict['5050_blended_wincon_playcount_recs'] = [deck for deck, sim in \
-                                                       sorted(blended_wincon_playcount_rec_decks, key=operator.itemgetter(1), reverse=True)[:n_recs] \
-                                                       if deck != input_deck]
+    result = []
+    for d, _ in sorted(blended_wincon_playcount_rec_decks, key=operator.itemgetter(1), reverse=True):
+        if d != input_deck:
+            result.append(d)
+        if len(result) == n_recs:
+            break
+    rec_dict['5050_blended_wincon_playcount_recs'] = result
 
     return json.dumps({'success':True, 'recs':rec_dict})
