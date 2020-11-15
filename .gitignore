@@ -3,3 +3,5 @@
 *.json
 /tmp
 /__pycache__
+token.txt
+vm_token.txt
