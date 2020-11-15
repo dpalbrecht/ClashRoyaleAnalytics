@@ -7,4 +7,4 @@ This web application was originally intended to be a place where players could e
 I have taken down the app because I no longer wish to maintain the web portion of this project, as I originally wanted to create various recommendation systems. Further, turns out it's really difficult to get users! It's not enough to build a great product. There are other, more well-known apps for Clash Royale players and I did not want to spend my time constantly creating content and attracting new users. With the additional knowledge that I couldn't easily monetize the site's insights due to API restrictions, it was clear that my time would be better spent elsewhere.  
  
 **So what's the plan for Competition Clash?**  
-For now, it will live here. I've since partnered with <a href="https://royaleapi.com/" target="_blank">RoyaleAPI</a> to help them improve their offering to users.
+For now, it will live here. I've since partnered with [RoyaleAPI](https://royaleapi.com/) to help them improve their offering to users.
